@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go-demo-2-pod
+  labels:
+    type: db
+    vendor: Mongo Labs
+spec:
+  containers:
+  - name: db
+    image: mongo
+  - name: api
+    image: vfarcic/go-demo-2
+    env:
+    - name: DB
+      value: localhost

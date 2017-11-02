@@ -1,0 +1,93 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: go-demo-2-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      stack: go-demo-2
+      type: api
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        stack: go-demo-2
+        type: api
+    spec:
+      containers:
+      - name: go-demo-2-api
+        image: vfarcic/go-demo-2:1
+        env:
+        - name: DB
+          value: go-demo-2-db
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-api
+  labels:
+    stack: go-demo-2
+    type: api
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    stack: go-demo-2
+    type: api
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: go-demo-2-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      stack: go-demo-2
+      type: db
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        stack: go-demo-2
+        type: db
+    spec:
+      containers:
+      - name: go-demo-2-db
+        image: mongo:3.3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-db
+  labels:
+    stack: go-demo-2
+    type: db
+spec:
+  type: ClusterIP
+  ports:
+  - port: 27017
+    protocol: TCP
+  selector:
+    stack: go-demo-2
+    type: db
