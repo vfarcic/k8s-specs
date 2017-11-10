@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: db-pod
+  name: db
   labels:
     type: db
-    vendor: Mongo Labs
+    vendor: MongoLabs
 spec:
   containers:
   - name: db
