@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go-demo-2
+  labels:
+    type: stack
+spec:
+  containers:
+  - name: db
+    image: mongo
+  - name: api
+    image: vfarcic/go-demo-2
+    env:
+    - name: DB
+      value: localhost
+    livenessProbe:
+      httpGet:
+        path: /this/path/does/not/exist
+        port: 8080
+      initialDelaySeconds: 5
+      timeoutSeconds: 2 # Defaults to 1
+      periodSeconds: 5 # Defaults to 10
+      failureThreshold: 1 # Defaults to 3
