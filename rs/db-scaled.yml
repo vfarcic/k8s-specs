@@ -1,19 +1,20 @@
 apiVersion: apps/v1beta2
 kind: ReplicaSet
 metadata:
-  name: db-rs
+  name: db
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
-      app: db
+      type: db
   template:
     metadata:
       labels:
-        app: db
+        type: db
+        vendor: MongoLabs
     spec:
       containers:
-      - name: db-ctr
+      - name: db
         image: mongo
         command: ["mongod"]
         args: ["--rest", "--httpinterface"]
