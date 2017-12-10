@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: go-demo-2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: backend
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: backend
+        service: go-demo-2
+        db: mongo
+        language: go
+    spec:
+      containers:
+      - name: db
+        image: mongo
+      - name: api
+        image: vfarcic/go-demo-2
+        env:
+        - name: DB
+          value: localhost
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
