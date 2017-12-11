@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: db
-    image: mongo
+    image: mongo:3.3
   - name: api
     image: vfarcic/go-demo-2
     env:

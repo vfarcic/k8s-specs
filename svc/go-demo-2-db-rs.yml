@@ -1,0 +1,25 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: go-demo-2-db
+spec:
+  replicas: 1 # New
+  selector:
+    matchLabels:
+      type: db # New
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: db # New
+        service: go-demo-2
+        vendor: MongoLabs
+    spec:
+      containers:
+      - name: db
+        image: mongo:3.3
+        command: ["mongod"]
+        args: ["--rest", "--httpinterface"]
+        ports:
+        - containerPort: 28017
+          protocol: TCP

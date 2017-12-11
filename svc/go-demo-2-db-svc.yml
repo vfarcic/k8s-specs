@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-db
+spec:
+  type: ClusterIP # New, default
+  ports:
+  - port: 27017
+    # nodePort: 30001 
+    # protocol: TCP
+  selector:
+    type: db # New
+    service: go-demo-2

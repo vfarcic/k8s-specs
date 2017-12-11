@@ -8,6 +8,6 @@ metadata:
 spec:
   containers:
   - name: db
-    image: mongo
+    image: mongo:3.3
     command: ["mongod"]
     args: ["--rest", "--httpinterface"]
