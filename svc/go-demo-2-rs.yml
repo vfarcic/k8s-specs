@@ -19,11 +19,11 @@ spec:
       containers:
       - name: db
         image: mongo:3.3
-        command: ["mongod"] # New
-        args: ["--rest", "--httpinterface"] # New
-        ports: # New
-        - containerPort: 28017 # New
-          protocol: TCP # New
+        command: ["mongod"]
+        args: ["--rest", "--httpinterface"]
+        ports:
+        - containerPort: 28017
+          protocol: TCP
       - name: api
         image: vfarcic/go-demo-2
         env:

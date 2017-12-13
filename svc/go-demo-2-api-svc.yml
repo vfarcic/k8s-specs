@@ -7,5 +7,5 @@ spec:
   ports:
   - port: 8080
   selector:
-    type: api # New
+    type: api
     service: go-demo-2

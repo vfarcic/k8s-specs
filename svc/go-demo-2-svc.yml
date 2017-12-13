@@ -7,7 +7,7 @@ spec:
   ports:
   - port: 28017
     nodePort: 30001
-    protocol: TCP # Default
+    protocol: TCP
   selector:
     type: backend
     service: go-demo-2

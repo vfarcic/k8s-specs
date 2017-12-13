@@ -3,7 +3,7 @@ kind: ReplicaSet
 metadata:
   name: go-demo-2-api
 spec:
-  replicas: 3 # New
+  replicas: 3
   selector:
     matchLabels:
       type: api
@@ -21,6 +21,11 @@ spec:
         env:
         - name: DB
           value: go-demo-2-db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
         livenessProbe:
           httpGet:
             path: /demo/hello
