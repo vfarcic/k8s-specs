@@ -9,4 +9,4 @@ services:
     deploy:
       replicas: 3
   db:
-    image: mongo3.3
+    image: mongo:3.3
