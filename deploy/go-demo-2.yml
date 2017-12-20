@@ -1,5 +1,5 @@
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: go-demo-2-db
 spec:
@@ -36,7 +36,7 @@ spec:
 ---
 
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: go-demo-2-api
 spec:
@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: vfarcic/go-demo-2
+        image: vfarcic/go-demo-2:1.0
         env:
         - name: DB
           value: go-demo-2-db

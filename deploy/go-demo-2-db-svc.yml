@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-db
+spec:
+  ports:
+  - port: 27017
+  selector:
+    type: db
+    service: go-demo-2

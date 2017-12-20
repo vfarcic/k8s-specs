@@ -1,0 +1,12 @@
+version: "3"
+services:
+  api:
+    image: vfarcic/go-demo-2
+    environment:
+      - DB=db
+    ports:
+      - 8080
+    deploy:
+      replicas: 3
+  db:
+    image: mongo:3.3

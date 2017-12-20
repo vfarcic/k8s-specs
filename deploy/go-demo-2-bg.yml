@@ -1,5 +1,5 @@
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: go-demo-2-db
 spec:
@@ -36,25 +36,64 @@ spec:
 ---
 
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: go-demo-2-api
+  name: go-demo-2-api-blue
 spec:
   replicas: 3
   selector:
     matchLabels:
       type: api
       service: go-demo-2
+      color: blue
   template:
     metadata:
       labels:
         type: api
         service: go-demo-2
+        color: blue
         language: go
     spec:
       containers:
       - name: api
-        image: vfarcic/go-demo-2
+        image: vfarcic/go-demo-2:1.0
+        env:
+        - name: DB
+          value: go-demo-2-db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: go-demo-2-api-green
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      type: api
+      service: go-demo-2
+      color: green
+  template:
+    metadata:
+      labels:
+        type: api
+        service: go-demo-2
+        color: green
+        language: go
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-2:1.0
         env:
         - name: DB
           value: go-demo-2-db
@@ -81,3 +120,18 @@ spec:
   selector:
     type: api
     service: go-demo-2
+    color: blue
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-api-test
+spec:
+  ports:
+  - port: 18080
+  selector:
+    type: api
+    service: go-demo-2
+    color: green

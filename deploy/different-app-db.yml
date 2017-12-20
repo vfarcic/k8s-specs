@@ -1,17 +1,17 @@
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: go-demo-2-db
+  name: different-app-db
 spec:
   selector:
     matchLabels:
       type: db
-      service: go-demo-2
+      service: different-app
   template:
     metadata:
       labels:
         type: db
-        service: go-demo-2
+        service: different-app
         vendor: MongoLabs
     spec:
       containers:

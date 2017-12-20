@@ -1,5 +1,5 @@
 apiVersion: apps/v1beta2
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: go-demo-2-db
 spec:
