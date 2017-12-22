@@ -56,7 +56,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: vfarcic/go-demo-2:1.0
+        image: vfarcic/go-demo-2
         env:
         - name: DB
           value: go-demo-2-db
@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: vfarcic/go-demo-2:1.0
+        image: vfarcic/go-demo-2
         env:
         - name: DB
           value: go-demo-2-db
