@@ -1,3 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: go-demo-2
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /demo
+        backend:
+          serviceName: go-demo-2-api
+          servicePort: 8080
+
+---
+
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -75,7 +92,6 @@ kind: Service
 metadata:
   name: go-demo-2-api
 spec:
-  type: NodePort
   ports:
   - port: 8080
   selector:

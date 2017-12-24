@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: devops-toolkit
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/rewrite-target: / # New
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /devops-toolkit # Modified
+        backend:
+          serviceName: devops-toolkit
+          servicePort: 80
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: devops-toolkit
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: frontend
+      service: devops-toolkit
+  template:
+    metadata:
+      labels:
+        type: frontend
+        service: devops-toolkit
+    spec:
+      containers:
+      - name: frontend
+        image: vfarcic/devops-toolkit-series:base-url # Modified
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops-toolkit
+spec:
+  ports:
+  - port: 80
+  selector:
+    type: frontend
+    service: devops-toolkit
