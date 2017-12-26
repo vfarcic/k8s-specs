@@ -4,13 +4,12 @@ metadata:
   name: devops-toolkit
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
-    ingress.kubernetes.io/rewrite-target: / # New
 spec:
   rules:
-  - http:
+  - host: devopstoolkitseries.com
+    http:
       paths:
-      - path: /devops-toolkit # Modified
-        backend:
+      - backend:
           serviceName: devops-toolkit
           servicePort: 80
 
@@ -34,7 +33,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: vfarcic/devops-toolkit-series:base-url # Modified
+        image: vfarcic/devops-toolkit-series
 
 ---
 
