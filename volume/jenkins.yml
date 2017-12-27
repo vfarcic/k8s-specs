@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jenkins
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /jenkins
+        backend:
+          serviceName: jenkins
+          servicePort: 8080
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  selector:
+    matchLabels:
+      type: master
+      service: jenkins
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        type: master
+        service: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: vfarcic/jenkins
+        env:
+        - name: JENKINS_OPTS
+          value: --prefix=/jenkins
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+spec:
+  ports:
+  - port: 8080
+  selector:
+    type: master
+    service: jenkins

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: github
+spec:
+  containers:
+  - name: github
+    image: docker:17.11
+    command:
+    - sleep
+    args:
+    - 100000
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-socket
+    - mountPath: /src
+      name: github
+  volumes:
+  - name: docker-socket
+    hostPath:
+      path: /var/run/docker.sock
+      type: Socket
+  - name: github
+    gitRepo:
+      repository: https://github.com/vfarcic/go-demo-2.git
+      directory: .
