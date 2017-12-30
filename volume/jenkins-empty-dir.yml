@@ -42,7 +42,7 @@ spec:
         - mountPath: /var/jenkins_home
           name: jenkins-home
       volumes:
-      - emptyDir:
+      - emptyDir: {}
         name: jenkins-home
 
 ---

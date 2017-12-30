@@ -6,10 +6,8 @@ spec:
   containers:
   - name: github
     image: docker:17.11
-    command:
-    - sleep
-    args:
-    - 100000
+    command: ["sleep"]
+    args: ["100000"]
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-socket
