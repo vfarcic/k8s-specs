@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine-env
+spec:
+  containers:
+  - name: alpine
+    image: alpine
+    command: ["sleep"]
+    args: ["100000"]
+    env:
+    - name: SOMETHING
+      valueFrom:
+        configMapKeyRef:
+          name: my-config
+          key: something
+    - name: WEATHER
+      valueFrom:
+        configMapKeyRef:
+          name: my-config
+          key: weather
