@@ -9,12 +9,12 @@ spec:
     command: ["sleep"]
     args: ["100000"]
     env:
-    - name: SOMETHING
+    - name: something
       valueFrom:
         configMapKeyRef:
           name: my-config
           key: something
-    - name: WEATHER
+    - name: weather
       valueFrom:
         configMapKeyRef:
           name: my-config
