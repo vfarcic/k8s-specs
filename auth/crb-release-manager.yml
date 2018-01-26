@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: release-manager
+rules:
+- resources: ["pods", "pods/attach", "pods/exec", "pods/log", "pods/status"]
+  verbs: ["*"]
+  apiGroups: [""]
+- resources: ["deployments", "replicasets"]
+  verbs: ["create", "get", "list", "update", "watch"]
+  apiGroups: ["", "apps", "extensions"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: release-manager
+  namespace: default
+subjects:
+- kind: User
+  name: jdoe
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: release-manager
+  apiGroup: rbac.authorization.k8s.io
