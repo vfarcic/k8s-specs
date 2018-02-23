@@ -1,2 +1,5 @@
 /tmp
 /keys
+/cluster
+/secrets
+/.creds
