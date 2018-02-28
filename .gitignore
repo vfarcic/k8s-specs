@@ -2,4 +2,4 @@
 /keys
 /cluster
 /secrets
-/.creds
+/kops-creds
