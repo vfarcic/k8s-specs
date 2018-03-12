@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+
+---
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  limits:
+  - default:
+      memory: 2Gi
+      cpu: 1
+    defaultRequest:
+      memory: 1Gi
+      cpu: 0.5
+    max:
+      memory: 3Gi
+      cpu: 1
+    min:
+      memory: 250Mi
+      cpu: 0.25
+    type: Container
+
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  hard:
+    requests.cpu: 3
+    requests.memory: 6Gi
+    limits.cpu: 4
+    limits.memory: 8Gi
+    pods: 16
+    
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: jenkins
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: jenkins
+  namespace: jenkins
+rules:
+- resources: ["pods", "pods/attach", "pods/exec", "pods/log", "pods/status"]
+  verbs: ["*"]
+  apiGroups: [""]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: jenkins
+  namespace: jenkins
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins
+subjects:
+- kind: ServiceAccount
+  name: jenkins
+
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      type: cd
+      app: jenkins
+  serviceName: jenkins
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        type: cd
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: jenkins
+        image: jenkins/2.109-alpine
+        env:
+        - name: JENKINS_OPTS
+          value: --prefix=/jenkins
+        - name: JAVA_OPTS
+          value: >-
+            # -XshowSettings:vm # TODO: What is this?
+            -XX:MaxRAM=${MEM_LIMIT}m # What is this?
+            # -XX:MaxRAMFraction=1 # TODO: What is this?
+            # -XX:+PrintGCDetails # TODO: What is this?
+            # -Dcb.IMProp.warProfiles=kubernetes.json # TODO: What is this?
+            # -Dcb.IMProp.warProfiles.cje=kubernetes.json # TODO: What is this?
+            # -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000 # TODO: What is this?
+        # - name: MEM_LIMIT # What is this?
+        #   valueFrom:
+        #     resourceFieldRef:
+        #       containerName: jenkins
+        #       resource: limits.memory
+        #       divisor: 1Mi
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        resources: # Combine with LimitRange
+          limits:
+            cpu: 1
+            memory: 1G
+          requests:
+            cpu: 0.5
+            memory: 500Mi
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+          # TODO: Add configurations as ConfigMaps
+        livenessProbe:
+          httpGet:
+            path: /jenkins/login
+            port: 8080
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+      # securityContext: # TODO: What is this?
+      #   fsGroup: 1000
+      # imagePullSecrets: # TODO: What is this?
+      # - name: docker.cloudbees.com
+  volumeClaimTemplates:
+  - metadata:
+      name: jenkins-home
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+spec:
+  selector:
+    type: cd
+    app: jenkins
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: jnlp
+    port: 50000
+    protocol: TCP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jenkins
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    # "413 Request Entity Too Large" uploading plugins, increase client_max_body_size
+    ingress.kubernetes.io/proxy-body-size: 50m # TODO: What is this?
+    ingress.kubernetes.io/proxy-request-buffering: "off" # TODO: What is this?
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /jenkins
+        backend:
+          serviceName: jenkins
+          servicePort: 8080

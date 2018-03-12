@@ -160,8 +160,9 @@ spec:
       - name: jenkins-configure-jenkins-groovy
         configMap:
           name: cjoc-configure-jenkins-groovy
-      securityContext:
-        fsGroup: 1000
+      # TODO: Fix
+      # securityContext:
+      #   fsGroup: 1000
       imagePullSecrets:
       - name: docker.cloudbees.com
   volumeClaimTemplates:

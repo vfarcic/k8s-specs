@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  selector:
+    matchLabels:
+      type: master
+      service: jenkins
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        type: master
+        service: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: vfarcic/jenkins
+        env:
+        - name: JENKINS_OPTS
+          value: --prefix=/jenkins
+        volumeMounts:
+        - mountPath: /var/jenkins_homew
+          name: jenkins-home
+      volumes:
+      - name: jenkins-home
+        persistentVolumeClaim:
+          claimName: jenkins
