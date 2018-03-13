@@ -2,10 +2,11 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: jenkins
+  namespace: jenkins
 spec:
   storageClassName: manual-ebs
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 1Gi

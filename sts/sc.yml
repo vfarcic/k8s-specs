@@ -1,0 +1,9 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+  labels:
+    type: ebs
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: io1 # https://aws.amazon.com/ebs/details/ > Amazon EBS Volume Types
