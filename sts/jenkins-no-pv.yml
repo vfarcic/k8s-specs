@@ -62,13 +62,16 @@ spec:
         - name: JENKINS_OPTS
           value: --prefix=/jenkins
         volumeMounts:
-        # - name: jenkins-home
-        #   mountPath: /var/jenkins_home
         - name: jenkins-creds
           mountPath: /run/secrets
+        resources:
+          limits:
+            memory: 2Gi
+            cpu: 1
+          requests:
+            memory: 1Gi
+            cpu: 0.5
       volumes:
-      # - name: jenkins-home
-      #   emptyDir: {}
       - name: jenkins-creds
         secret:
           secretName: jenkins-creds
