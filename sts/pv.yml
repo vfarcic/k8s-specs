@@ -19,7 +19,7 @@ spec:
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: manual-ebs-01
+  name: manual-ebs-02
   labels:
     type: ebs
 spec:
@@ -37,7 +37,7 @@ spec:
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: manual-ebs-01
+  name: manual-ebs-03
   labels:
     type: ebs
 spec:
