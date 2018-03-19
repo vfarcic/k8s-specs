@@ -7,3 +7,4 @@ metadata:
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: io1 # https://aws.amazon.com/ebs/details/ > Amazon EBS Volume Types
+reclaimPolicy: Delete
