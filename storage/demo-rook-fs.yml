@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+      - name: demo
+        image: alpine
+        command: ["sleep"]
+        args: ["100000"]
+        volumeMounts:
+        - name: demo-storage
+          mountPath: /tmp
+      volumes:
+      - name: demo-storage
+        flexVolume:
+          driver: rook.io/rook
+          fsType: ceph
+          options:
+            fsName: rook-fs
+            clusterName: rook

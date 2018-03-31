@@ -4,6 +4,7 @@ metadata:
   name: default
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   backend:
     serviceName: devops-toolkit

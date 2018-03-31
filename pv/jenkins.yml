@@ -12,6 +12,7 @@ metadata:
   namespace: jenkins
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
   - http:

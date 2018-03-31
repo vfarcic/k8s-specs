@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: go-demo-2
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api
+  namespace: go-demo-2
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /demo
+        backend:
+          serviceName: api
+          servicePort: 8080
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo
+  namespace: go-demo-2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: db
+  namespace: go-demo-2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: db
+      app: go-demo-2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        type: db
+        app: go-demo-2
+        vendor: MongoLabs
+    spec:
+      containers:
+      - name: db
+        image: mongo:3.3
+        resources:
+          limits:
+            memory: "100Mi"
+            cpu: 0.1
+          requests:
+            memory: "50Mi"
+            cpu: 0.01
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+      volumes:
+      - name: mongo-data
+        persistentVolumeClaim:
+          claimName: mongo
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: go-demo-2
+spec:
+  ports:
+  - port: 27017
+  selector:
+    type: db
+    app: go-demo-2
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: api
+  namespace: go-demo-2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: api
+      app: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: api
+        app: go-demo-2
+        language: go
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-2
+        env:
+        - name: DB
+          value: db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+        resources:
+          limits:
+            memory: "10Mi"
+            cpu: 0.1
+          requests:
+            memory: "5Mi"
+            cpu: 0.01
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: go-demo-2
+spec:
+  ports:
+  - port: 8080
+  selector:
+    type: api
+    app: go-demo-2

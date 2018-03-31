@@ -4,6 +4,7 @@ metadata:
   name: go-demo-2
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
   - host: go-demo-2.com

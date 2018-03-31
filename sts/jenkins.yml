@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  selector:
+    name: jenkins
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: agent
+    port: 50000
+    protocol: TCP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jenkins
+  namespace: jenkins
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/proxy-body-size: 50m
+    ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /jenkins
+        backend:
+          serviceName: jenkins
+          servicePort: 80
+
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: jenkins
+  namespace: jenkins
+  labels:
+    name: jenkins
+spec:
+  serviceName: jenkins
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      name: jenkins
+      labels:
+        name: jenkins
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: jenkins
+        image: jenkins/jenkins:lts-alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 0.5
+            memory: 500Mi
+        env:
+        - name: JENKINS_OPTS
+          value: --prefix=/jenkins
+        - name: LIMITS_MEMORY
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
+              divisor: 1Mi
+        - name: JAVA_OPTS
+          value: -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        livenessProbe:
+          httpGet:
+            path: /jenkins/login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12 # ~2 minutes
+        readinessProbe:
+          httpGet:
+            path: /jenkins/login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12 # ~2 minutes
+      securityContext:
+        fsGroup: 1000
+  volumeClaimTemplates:
+  - metadata:
+      name: jenkins-home
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi

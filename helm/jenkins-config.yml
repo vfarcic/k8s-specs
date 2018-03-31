@@ -1,0 +1,12 @@
+Master:
+  ServiceType: NodePort
+  NodePort: 31001
+  InstallPlugins:
+    - kubernetes:1.4
+    - credentials:2.1.16
+    - workflow-aggregator:2.5
+    - git-client:2.7.1
+    - pipeline-utility-steps:2.0.1
+    - git:3.8.0
+    - github:1.29.0
+    - blueocean:1.4.2

@@ -4,6 +4,7 @@ metadata:
   name: devops-toolkit
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
   - host: devopstoolkitseries.com
