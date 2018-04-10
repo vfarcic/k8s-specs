@@ -105,6 +105,8 @@ spec:
           value: "app=db"
         - name: KUBE_NAMESPACE
           value: go-demo-3
+        - name: KUBERNETES_MONGO_SERVICE_NAME
+          value: db
   volumeClaimTemplates:
   - metadata:
       name: mongo-data

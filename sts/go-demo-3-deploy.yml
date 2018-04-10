@@ -84,8 +84,7 @@ spec:
   ports:
   - port: 27017
   selector:
-    type: db
-    app: go-demo-3
+    app: db
 
 ---
 
@@ -138,5 +137,4 @@ spec:
   ports:
   - port: 8080
   selector:
-    type: api
-    app: go-demo-3
+    app: api

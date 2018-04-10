@@ -30,10 +30,10 @@ metadata:
   name: jenkins
   namespace: jenkins
   annotations:
-    ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/ssl-redirect: "false"
     ingress.kubernetes.io/proxy-body-size: 50m
     ingress.kubernetes.io/proxy-request-buffering: "off"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:

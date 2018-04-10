@@ -43,7 +43,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: db
-        image: mongo:3.3
+        image: mongo:3.4
         command:
           - mongod
           - "--replSet"
@@ -62,15 +62,6 @@ spec:
         volumeMounts:
         - name: mongo-data
           mountPath: /data/db
-      - name: db-sidecar
-        image: cvallance/mongo-k8s-sidecar
-        env:
-        - name: MONGO_SIDECAR_POD_LABELS
-          value: "app=db"
-        - name: KUBE_NAMESPACE
-          value: go-demo-3
-        - name: KUBERNETES_MONGO_SERVICE_NAME
-          value: db
   volumeClaimTemplates:
   - metadata:
       name: mongo-data
