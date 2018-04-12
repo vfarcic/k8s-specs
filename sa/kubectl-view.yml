@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubectl
+spec:
+  serviceAccountName: view
+  containers:
+  - name: kubectl
+    image: vfarcic/kubectl
+    command: ["sleep"]
+    args: ["100000"]

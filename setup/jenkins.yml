@@ -1,0 +1,323 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: build
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: master
+  namespace: jenkins
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: master
+  namespace: build
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec", "pods/log"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: master
+  namespace: build
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: master
+subjects:
+- kind: ServiceAccount
+  name: master
+  namespace: jenkins
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: master
+  namespace: jenkins
+spec:
+  selector:
+    app: master
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: agent
+    port: 50000
+    protocol: TCP
+  clusterIP: None
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: master
+  namespace: jenkins
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/proxy-body-size: 50m
+    ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /jenkins
+        backend:
+          serviceName: master
+          servicePort: 80
+
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: master
+  namespace: jenkins
+  labels:
+    app: master
+spec:
+  serviceName: master
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      name: master
+      labels:
+        app: master
+    spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: master
+      containers:
+      - name: master
+        image: jenkins/jenkins:lts-alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 0.5
+            memory: 500Mi
+        env:
+        - name: JENKINS_OPTS
+          value: --prefix=/jenkins
+        - name: LIMITS_MEMORY
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
+              divisor: 1Mi
+        - name: JAVA_OPTS
+          value: -Djenkins.install.runSetupWizard=false -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+        volumeMounts:
+        - name: master-home
+          mountPath: /var/jenkins_home
+        - name: master-conf
+          mountPath: /var/jenkins_config
+        - name: master-ref
+          mountPath: /usr/share/jenkins/ref/
+        - name: master-creds
+          mountPath: /var/jenkins_secrets
+        livenessProbe:
+          httpGet:
+            path: /jenkins/login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12 # ~2 minutes
+        readinessProbe:
+          httpGet:
+            path: /jenkins/login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12 # ~2 minutes
+      initContainers:
+      - name: master-init
+        image: jenkins/jenkins:lts-alpine
+        command: ["/bin/sh", "-c", "/var/jenkins_config/init.sh"]
+        volumeMounts:
+        - name: master-home
+          mountPath: /var/jenkins_home
+        - name: master-conf
+          mountPath: /var/jenkins_config
+        - name: master-ref
+          mountPath: /usr/share/jenkins/ref/
+      volumes:
+      - name: master-conf
+        configMap:
+          name: master-conf
+          defaultMode: 511
+      - name: master-ref
+        emptyDir: {}
+      - name: master-creds
+        secret:
+          secretName: master-creds
+          defaultMode: 0444
+          items:
+          - key: user
+            path: user
+          - key: pass
+            path: pass
+      securityContext:
+        fsGroup: 1000
+  volumeClaimTemplates:
+  - metadata:
+      name: master-home
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: master-conf
+  namespace: jenkins
+data:
+  plugins.txt: |-
+    blueocean
+    credentials
+    ec2
+    git
+    git-client
+    github
+    kubernetes
+    pipeline-utility-steps
+    script-security
+    slack
+    thinBackup
+    workflow-aggregator
+  init.sh: |-
+     /usr/local/bin/install-plugins.sh < /var/jenkins_config/plugins.txt
+     mkdir -p /usr/share/jenkins/ref/init.groovy.d
+     cp /var/jenkins_config/security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
+     cp /var/jenkins_config/config.xml /usr/share/jenkins/ref/config.xml
+  config.xml: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <hudson>
+      <disabledAdministrativeMonitors/>
+      <version>2.107.2</version>
+      <installState>
+        <isSetupComplete>true</isSetupComplete>
+        <name>RUNNING</name>
+      </installState>
+      <numExecutors>2</numExecutors>
+      <mode>NORMAL</mode>
+      <useSecurity>true</useSecurity>
+      <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy">
+        <denyAnonymousReadAccess>false</denyAnonymousReadAccess>
+      </authorizationStrategy>
+      <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
+        <disableSignup>true</disableSignup>
+        <enableCaptcha>false</enableCaptcha>
+      </securityRealm>
+      <disableRememberMe>false</disableRememberMe>
+      <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+      <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULL_NAME}</workspaceDir>
+      <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+      <jdks/>
+      <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+      <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+      <clouds>
+        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@1.5.1">
+          <name>kubernetes</name>
+          <defaultsProviderTemplate></defaultsProviderTemplate>
+          <templates/>
+          <serverUrl></serverUrl>
+          <skipTlsVerify>false</skipTlsVerify>
+          <namespace>build</namespace>
+          <jenkinsUrl>http://master.jenkins:8080/jenkins</jenkinsUrl>
+          <containerCap>10</containerCap>
+          <retentionTimeout>5</retentionTimeout>
+          <connectTimeout>0</connectTimeout>
+          <readTimeout>0</readTimeout>
+          <maxRequestsPerHost>32</maxRequestsPerHost>
+        </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+      </clouds>
+      <quietPeriod>5</quietPeriod>
+      <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+      <views>
+        <hudson.model.AllView>
+          <owner class="hudson" reference="../../.."/>
+          <name>all</name>
+          <filterExecutors>false</filterExecutors>
+          <filterQueue>false</filterQueue>
+          <properties class="hudson.model.View$PropertyList"/>
+        </hudson.model.AllView>
+      </views>
+      <primaryView>all</primaryView>
+      <slaveAgentPort>0</slaveAgentPort>
+      <label></label>
+      <nodeProperties/>
+      <globalNodeProperties/>
+    </hudson>
+  security.groovy: |-
+    #!groovy
+
+    import jenkins.model.*
+    import hudson.security.*
+    import jenkins.security.s2m.AdminWhitelistRule
+
+    def instance = Jenkins.getInstance()
+
+    def user = new File("/var/jenkins_secrets/user").text.trim()
+    def pass = new File("/var/jenkins_secrets/pass").text.trim()
+
+    println "Creating user " + user + "..."
+
+    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+    hudsonRealm.createAccount(user, pass)
+    instance.setSecurityRealm(hudsonRealm)
+
+    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+    instance.setAuthorizationStrategy(strategy)
+    instance.save()
+
+    Jenkins.instance.getInjector().getInstance(AdminWhitelistRule.class).setMasterKillSwitch(false)
+
+    println "User " + user + " was created"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: master-creds
+  namespace: jenkins
+type: Opaque
+data:
+  user: amRvZQ==
+  pass: aW5jb2duaXRv

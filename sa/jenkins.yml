@@ -6,9 +6,16 @@ metadata:
 ---
 
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: build
+
+---
+
+apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: jenkins
+  name: master
   namespace: jenkins
 
 ---
@@ -16,8 +23,8 @@ metadata:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: jenkins
-  namespace: jenkins
+  name: master
+  namespace: build
 rules:
 - apiGroups: [""]
   resources: ["pods", "pods/exec", "pods/log"]
@@ -31,26 +38,27 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: jenkins
-  namespace: jenkins
+  name: master
+  namespace: build
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: jenkins
+  name: master
 subjects:
 - kind: ServiceAccount
-  name: jenkins
+  name: master
+  namespace: jenkins
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: jenkins
+  name: master
   namespace: jenkins
 spec:
   selector:
-    name: jenkins
+    app: master
   ports:
   - name: http
     port: 80
@@ -59,13 +67,14 @@ spec:
   - name: agent
     port: 50000
     protocol: TCP
+  clusterIP: None
 
 ---
 
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: jenkins
+  name: master
   namespace: jenkins
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -80,7 +89,7 @@ spec:
       paths:
       - path: /jenkins
         backend:
-          serviceName: jenkins
+          serviceName: master
           servicePort: 80
 
 ---
@@ -88,25 +97,25 @@ spec:
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: jenkins
+  name: master
   namespace: jenkins
   labels:
-    name: jenkins
+    app: master
 spec:
-  serviceName: jenkins
+  serviceName: master
   replicas: 1
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
-      name: jenkins
+      name: master
       labels:
-        name: jenkins
+        app: master
     spec:
       terminationGracePeriodSeconds: 10
-      serviceAccountName: jenkins
+      serviceAccountName: master
       containers:
-      - name: jenkins
+      - name: master
         image: jenkins/jenkins:lts-alpine
         imagePullPolicy: Always
         ports:
@@ -130,7 +139,7 @@ spec:
         - name: JAVA_OPTS
           value: -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
         volumeMounts:
-        - name: jenkins-home
+        - name: master-home
           mountPath: /var/jenkins_home
         livenessProbe:
           httpGet:
@@ -150,7 +159,7 @@ spec:
         fsGroup: 1000
   volumeClaimTemplates:
   - metadata:
-      name: jenkins-home
+      name: master-home
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
