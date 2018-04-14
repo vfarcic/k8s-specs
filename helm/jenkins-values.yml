@@ -1,0 +1,31 @@
+Master:
+  ImageTag: "2.116-alpine"
+  Cpu: "500m"
+  Memory: "500Mi"
+  ServiceType: ClusterIP
+  ServiceAnnotations:
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+  InstallPlugins:
+    - blueocean:1.5.0
+    - credentials:2.1.16
+    - ec2:1.39
+    - git:3.8.0
+    - git-client:2.7.1
+    - github:1.29.0
+    - kubernetes:1.5.1
+    - pipeline-utility-steps:2.0.2
+    - script-security:1.43
+    - slack:2.3
+    - thinBackup:1.9
+    - workflow-aggregator:2.5
+  Ingress:
+    Annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+      ingress.kubernetes.io/ssl-redirect: "false"
+      ingress.kubernetes.io/proxy-body-size: 50m
+      ingress.kubernetes.io/proxy-request-buffering: "off"
+  HostName: jenkins.acme.com
+rbac:
+  install: true
