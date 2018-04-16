@@ -12,7 +12,7 @@ Master:
     - git:3.8.0
     - git-client:2.7.1
     - github:1.29.0
-    - kubernetes:1.5.1
+    - kubernetes:1.5.2
     - pipeline-utility-steps:2.0.2
     - script-security:1.43
     - slack:2.3
