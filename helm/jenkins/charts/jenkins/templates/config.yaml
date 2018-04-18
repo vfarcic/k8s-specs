@@ -1,4 +1,4 @@
-{{- define "override_config_map" }}
+{{- if not .Values.Master.CustomConfigMap }}
 
 apiVersion: v1
 kind: ConfigMap
@@ -97,57 +97,13 @@ data:
           <serverUrl>https://kubernetes.default</serverUrl>
           <skipTlsVerify>false</skipTlsVerify>
           <namespace>{{ .Release.Namespace }}</namespace>
-          <jenkinsUrl>http://{{ template "jenkins.fullname" . }}.{{ .Release.Namespace }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</jenkinsUrl>
-          <jenkinsTunnel>{{ template "jenkins.fullname" . }}-agent.{{ .Release.Namespace }}:50000</jenkinsTunnel>
+          <jenkinsUrl>http://{{ template "jenkins.fullname" . }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</jenkinsUrl>
+          <jenkinsTunnel>{{ template "jenkins.fullname" . }}-agent:50000</jenkinsTunnel>
           <containerCap>10</containerCap>
           <retentionTimeout>5</retentionTimeout>
           <connectTimeout>0</connectTimeout>
           <readTimeout>0</readTimeout>
         </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
-        <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.38">
-          <name>ec2-docker-agents</name>
-          <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
-          <credentialsId>aws</credentialsId>
-          <privateKey>
-            <privateKey></privateKey>
-          </privateKey>
-          <instanceCap>2147483647</instanceCap>
-          <templates>
-            <hudson.plugins.ec2.SlaveTemplate>
-              <ami>{{.Values.Master.AMI}}</ami>
-              <description>docker</description>
-              <zone></zone>
-              <securityGroups>docker</securityGroups>
-              <remoteFS></remoteFS>
-              <type>T2Micro</type>
-              <ebsOptimized>false</ebsOptimized>
-              <labels>docker</labels>
-              <mode>NORMAL</mode>
-              <initScript></initScript>
-              <tmpDir></tmpDir>
-              <userData></userData>
-              <numExecutors>1</numExecutors>
-              <remoteAdmin>ubuntu</remoteAdmin>
-              <jvmopts></jvmopts>
-              <subnetId></subnetId>
-              <idleTerminationMinutes>1</idleTerminationMinutes>
-              <iamInstanceProfile></iamInstanceProfile>
-              <deleteRootOnTermination>false</deleteRootOnTermination>
-              <useEphemeralDevices>false</useEphemeralDevices>
-              <customDeviceMapping></customDeviceMapping>
-              <instanceCap>2147483647</instanceCap>
-              <stopOnTerminate>false</stopOnTerminate>
-              <usePrivateDnsName>false</usePrivateDnsName>
-              <associatePublicIp>false</associatePublicIp>
-              <useDedicatedTenancy>false</useDedicatedTenancy>
-              <launchTimeout>2147483647</launchTimeout>
-              <connectBySSHProcess>false</connectBySSHProcess>
-              <connectUsingPublicIp>false</connectUsingPublicIp>
-              <node>true</node>
-            </hudson.plugins.ec2.SlaveTemplate>
-          </templates>
-          <region>us-east-2</region>
-        </hudson.plugins.ec2.EC2Cloud>
       </clouds>
       <quietPeriod>5</quietPeriod>
       <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
@@ -222,4 +178,6 @@ data:
 {{ $val | indent 4 }}
 {{- end }}
 {{- end }}
+{{ else }}
+{{ include "override_config_map" . }}
 {{- end -}}
