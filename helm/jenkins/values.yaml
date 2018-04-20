@@ -29,6 +29,6 @@ jenkins:
         ingress.kubernetes.io/proxy-request-buffering: "off"
     HostName: jenkins.acme.com
     CustomConfigMap: true
-    CredentialsXmlSecret: jenkins-aws-credentials
+    # AMI:
   rbac:
     install: true

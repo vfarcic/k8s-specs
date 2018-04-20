@@ -62,11 +62,13 @@ spec:
         env:
         - name: JENKINS_OPTS
           value: --prefix=/jenkins
+        - name: SECRETS_DIR
+          value: /etc/secrets
         volumeMounts:
         - name: jenkins-home
           mountPath: /var/jenkins_home
         - name: jenkins-creds
-          mountPath: /run/secrets
+          mountPath: /etc/secrets
         resources:
           limits:
             memory: 2Gi
