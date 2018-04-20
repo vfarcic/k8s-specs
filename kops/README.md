@@ -12,7 +12,7 @@ brew install kops
 
 Get root or admin access keys
 
-Save keys to `./creds/root-creds` in following format - the creds folder is .gitignored in the root folder.
+Save keys to `./creds/root-creds` in following format - .gitignore creds or add as meta project so keys are not checked in with this project!
 
 ```
 {
@@ -51,3 +51,16 @@ Then run
 sh cluster-setup.sh
 ```
 
+## Delete
+
+To delete your cluster:
+
+```
+sh delete-kops.sh
+```
+
+To delete kops AWS resources:
+
+```
+sh delete-aws.sh
+```
