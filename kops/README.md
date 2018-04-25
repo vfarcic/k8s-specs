@@ -46,8 +46,9 @@ Next, Switch to the user `kops`
 source kops.env
 ```
 
-Then run 
-```
+Then run :
+
+```bash
 sh cluster-setup.sh
 ```
 

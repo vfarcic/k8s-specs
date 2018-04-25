@@ -1,28 +1,49 @@
-aws ec2 create-key-pair \
-  --key-name kops \
-  | jq -r '.KeyMaterial' \
-  >creds/kops.pem
+# TODO: Convert env. vars to arguments
 
-chmod 400 creds/kops.pem
+if [[ -z "${BUCKET_NAME}" ]]; then
+    export BUCKET_NAME=devops23-$(date +%s)
+    aws s3api create-bucket --bucket $BUCKET_NAME --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION
+fi
 
-ssh-keygen -y -f creds/kops.pem \
-  >creds/kops.pub
+export KOPS_STATE_STORE=s3://$BUCKET_NAME
 
-aws s3api create-bucket \
-  --bucket $BUCKET_NAME \
-  --create-bucket-configuration \
-  LocationConstraint=$AWS_DEFAULT_REGION
+# TODO: Create `alias` for Windows
 
 kops create cluster \
-  --name $NAME \
-  --master-count 3 \
-  --node-count 1 \
-  --node-size t2.small \
-  --master-size t2.small \
+  --name ${NAME:-devops23.k8s.local} \
+  --master-count ${MASTER_COUNT:-3} \
+  --node-count ${NODE_COUNT:-1} \
+  --master-size ${MASTER_SIZE:-t2.small} \
+  --node-size ${NODE_SIZE:-t2.small} \
   --zones $ZONES \
   --master-zones $ZONES \
-  --ssh-public-key creds/kops.pub \
+  --ssh-public-key ${SSH_PUBLIC_KEY:-cluster/devops23.pub} \
   --networking kubenet \
-  --kubernetes-version v1.8.7 \
   --authorization RBAC \
   --yes
+
+# TODO: export `kubecfg` for Windows
+
+until kops validate cluster
+do
+    echo "Cluster is not yet ready. Sleeping for a while..."
+    sleep 30
+done
+
+kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/ingress-nginx/v1.6.0.yaml
+
+kubectl -n kube-ingress rollout status deployment ingress-nginx
+
+if [[ ! -z "${USE_HELM}" ]]; then
+    kubectl create -f helm/tiller-rbac.yml --record --save-config
+    helm init --service-account tiller
+    kubectl -n kube-system rollout status deploy tiller-deploy
+fi
+
+echo ""
+echo "------------------------------------------"
+echo ""
+echo "The cluster is ready. Please execute the commands that follow to create the environment variables."
+echo ""
+echo "export BUCKET_NAME=$BUCKET_NAME"
+echo "export KOPS_STATE_STORE=$KOPS_STATE_STORE"

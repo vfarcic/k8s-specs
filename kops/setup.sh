@@ -38,3 +38,13 @@ echo "Enter your organization's name (lowercase): "
 read -r org
 
 sed -i .bak 's/MY_ORG_NAME/'$org'/' ./kops.env
+
+aws ec2 create-key-pair \
+  --key-name kops \
+  | jq -r '.KeyMaterial' \
+  >creds/kops.pem
+
+chmod 400 creds/kops.pem
+
+ssh-keygen -y -f creds/kops.pem \
+  >creds/kops.pub
