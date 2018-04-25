@@ -1,7 +1,9 @@
 # TODO: Convert env. vars to arguments
 
 if [[ -z "${BUCKET_NAME}" ]]; then
+    echo "Creating an S3 bucket"
     export BUCKET_NAME=devops23-$(date +%s)
+    # TODO: Check whether the bucket exists and create it if it doesn't
     aws s3api create-bucket --bucket $BUCKET_NAME --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION
 fi
 

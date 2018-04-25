@@ -4,3 +4,4 @@
 /secrets
 /kops-creds
 /kops/creds
+/prod.yml
