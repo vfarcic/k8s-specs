@@ -1,9 +1,12 @@
 # TODO: Convert env. vars to arguments
 
 if [[ -z "${BUCKET_NAME}" ]]; then
-    echo "Creating an S3 bucket"
     export BUCKET_NAME=devops23-$(date +%s)
-    # TODO: Check whether the bucket exists and create it if it doesn't
+fi
+
+BUCKET_NAME_FROM_AWS=$(aws s3api list-buckets | jq ".Buckets[] | select(.Name == \"$BUCKET_NAME\") | .Name")
+if [[ -z "${BUCKET_NAME_FROM_AWS}" ]]; then
+    echo "Creating an S3 bucket $BUCKET_NAME"
     aws s3api create-bucket --bucket $BUCKET_NAME --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION
 fi
 
@@ -47,5 +50,6 @@ echo "------------------------------------------"
 echo ""
 echo "The cluster is ready. Please execute the commands that follow to create the environment variables."
 echo ""
+echo "export NAME=$NAME"
 echo "export BUCKET_NAME=$BUCKET_NAME"
 echo "export KOPS_STATE_STORE=$KOPS_STATE_STORE"

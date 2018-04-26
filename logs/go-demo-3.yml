@@ -24,6 +24,41 @@ spec:
 
 ---
 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db
+  namespace: go-demo-3
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: db
+  namespace: go-demo-3
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: db
+  namespace: go-demo-3
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: db
+subjects:
+- kind: ServiceAccount
+  name: db
+
+---
+
 apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
@@ -40,6 +75,7 @@ spec:
       labels:
         app: db
     spec:
+      serviceAccountName: db
       terminationGracePeriodSeconds: 10
       containers:
       - name: db
@@ -69,6 +105,8 @@ spec:
           value: "app=db"
         - name: KUBE_NAMESPACE
           value: go-demo-3
+        - name: KUBERNETES_MONGO_SERVICE_NAME
+          value: db
   volumeClaimTemplates:
   - metadata:
       name: mongo-data
