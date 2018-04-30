@@ -12,7 +12,21 @@ fi
 
 export KOPS_STATE_STORE=s3://$BUCKET_NAME
 
-# TODO: Create `alias` for Windows
+machine=$(uname)
+
+if ! [[ "$machine" == "Linux" || "$machine" == "Darwin" ]]; then
+    alias kops="docker run -it --rm \
+        -v $PWD/devops23.pub:/devops23.pub \
+        -v $PWD/config:/config \
+        -e KUBECONFIG=/config/kubecfg.yaml \
+        -e NAME=$NAME -e ZONES=$ZONES \
+        -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+        -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+        -e KOPS_STATE_STORE=$KOPS_STATE_STORE \
+        vfarcic/kops"
+fi
+
+extra_args=""
 
 kops create cluster \
   --name ${NAME:-devops23.k8s.local} \
@@ -27,13 +41,16 @@ kops create cluster \
   --authorization RBAC \
   --yes
 
-# TODO: export `kubecfg` for Windows
-
 until kops validate cluster
 do
     echo "Cluster is not yet ready. Sleeping for a while..."
     sleep 30
 done
+
+if ! [[ "$machine" == "Linux" || "$machine" == "Darwin" ]]; then
+    kops export kubecfg --name ${NAME}
+    export KUBECONFIG=$PWD/config/kubecfg.yaml
+fi
 
 kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/ingress-nginx/v1.6.0.yaml
 
@@ -53,3 +70,6 @@ echo ""
 echo "export NAME=$NAME"
 echo "export BUCKET_NAME=$BUCKET_NAME"
 echo "export KOPS_STATE_STORE=$KOPS_STATE_STORE"
+if ! [[ "$machine" == "Linux" || "$machine" == "Darwin" ]]; then
+    echo "export KUBECONFIG=$KUBECONFIG"
+fi

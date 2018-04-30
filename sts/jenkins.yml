@@ -13,6 +13,7 @@ metadata:
 spec:
   selector:
     name: jenkins
+  type: NodePort
   ports:
   - name: http
     port: 80
