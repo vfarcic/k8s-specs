@@ -57,6 +57,7 @@ metadata:
   name: jenkins
   namespace: jenkins
 spec:
+  type: LoadBalancer
   selector:
     app: jenkins
   ports:
@@ -70,26 +71,23 @@ spec:
 
 ---
 
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: v1
+kind: Route
 metadata:
   name: jenkins
   namespace: jenkins
-  annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
-    ingress.kubernetes.io/proxy-body-size: 50m
-    ingress.kubernetes.io/proxy-request-buffering: "off"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /jenkins
-        backend:
-          serviceName: jenkins
-          servicePort: 80
+  path: /jenkins
+  to:
+    kind: Service
+    name: jenkins
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    insecureEdgeTerminationPolicy: Allow
+    termination: edge
 
 ---
 
@@ -155,7 +153,6 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 12 # ~2 minutes
       securityContext:
-        fsGroup: 1000
   volumeClaimTemplates:
   - metadata:
       name: jenkins-home

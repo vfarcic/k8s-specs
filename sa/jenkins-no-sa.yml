@@ -8,11 +8,11 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: master
+  name: jenkins
   namespace: jenkins
 spec:
   selector:
-    app: master
+    app: jenkins
   ports:
   - name: http
     port: 80
@@ -21,54 +21,53 @@ spec:
   - name: agent
     port: 50000
     protocol: TCP
-  clusterIP: None
 
 ---
 
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: master
+  name: jenkins
   namespace: jenkins
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
     ingress.kubernetes.io/ssl-redirect: "false"
     ingress.kubernetes.io/proxy-body-size: 50m
     ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
   rules:
   - http:
       paths:
       - path: /jenkins
         backend:
-          serviceName: master
+          serviceName: jenkins
           servicePort: 80
 
 ---
 
-apiVersion: apps/v1beta1
+apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
-  name: master
+  name: jenkins
   namespace: jenkins
-  labels:
-    app: master
 spec:
-  serviceName: master
+  selector:
+    matchLabels:
+      app: jenkins
+  serviceName: jenkins
   replicas: 1
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
-      name: master
       labels:
-        app: master
+        app: jenkins
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: master
+      - name: jenkins
         image: jenkins/jenkins:lts-alpine
         imagePullPolicy: Always
         ports:
@@ -92,7 +91,7 @@ spec:
         - name: JAVA_OPTS
           value: -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
         volumeMounts:
-        - name: master-home
+        - name: jenkins-home
           mountPath: /var/jenkins_home
         livenessProbe:
           httpGet:
@@ -112,7 +111,7 @@ spec:
         fsGroup: 1000
   volumeClaimTemplates:
   - metadata:
-      name: master-home
+      name: jenkins-home
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

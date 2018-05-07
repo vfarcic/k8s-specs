@@ -6,57 +6,12 @@ metadata:
 ---
 
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: build
-
----
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: jenkins
-  namespace: jenkins
-
----
-
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: jenkins
-  namespace: build
-rules:
-- apiGroups: [""]
-  resources: ["pods", "pods/exec", "pods/log"]
-  verbs: ["*"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get"]
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: jenkins
-  namespace: build
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: jenkins
-subjects:
-- kind: ServiceAccount
-  name: jenkins
-  namespace: jenkins
-
----
-
-apiVersion: v1
 kind: Service
 metadata:
   name: jenkins
   namespace: jenkins
 spec:
+  type: LoadBalancer
   selector:
     app: jenkins
   ports:
@@ -70,26 +25,23 @@ spec:
 
 ---
 
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: v1
+kind: Route
 metadata:
   name: jenkins
   namespace: jenkins
-  annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
-    ingress.kubernetes.io/proxy-body-size: 50m
-    ingress.kubernetes.io/proxy-request-buffering: "off"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /jenkins
-        backend:
-          serviceName: jenkins
-          servicePort: 80
+  path: /jenkins
+  to:
+    kind: Service
+    name: jenkins
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    insecureEdgeTerminationPolicy: Allow
+    termination: edge
 
 ---
 
@@ -112,7 +64,6 @@ spec:
         app: jenkins
     spec:
       terminationGracePeriodSeconds: 10
-      serviceAccountName: jenkins
       containers:
       - name: jenkins
         image: jenkins/jenkins:lts-alpine
@@ -155,7 +106,6 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 12 # ~2 minutes
       securityContext:
-        fsGroup: 1000
   volumeClaimTemplates:
   - metadata:
       name: jenkins-home
