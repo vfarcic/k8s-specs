@@ -1,0 +1,49 @@
+# vi: set ft=ruby :
+ 
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/xenial64"
+
+    config.vm.define "master" do |node|
+      node.vm.hostname = "master"
+      node.vm.network :private_network, ip: "10.100.198.200"
+      node.vm.provision :shell, inline: "sed 's/127\.0\.0\.1.*master.*/10\.100\.198\.200 master/' -i /etc/hosts"
+      node.vm.provision :shell, path: "bootstrap.sh" 
+      node.vm.provision :shell, path: "master.sh" 
+	   # for basic CNI plugins
+      node.vm.provision "cni", type: "shell", path: "config_cni.sh", env: {"NODE_SUBNET" => "10.22.1.0/24"} 
+      config.vm.provider "virtualbox" do |v|
+      	v.memory = 2048
+      	v.cpus = 2
+      end
+    end
+ 
+    config.vm.define "node1" do |node|
+      node.vm.hostname = "node1"
+      node.vm.network :private_network, ip: "10.100.198.201"
+      node.vm.provision :shell, inline: "sed 's/127\.0\.0\.1.*node1.*/10\.100\.198\.201 node1/' -i /etc/hosts"
+      node.vm.provision :shell, path: "bootstrap.sh"
+      node.vm.provision "join", type: "shell", path: "node.sh" 
+	   # for basic CNI plugins
+      node.vm.provision "cni", type: "shell", path: "config_cni.sh", env: {"NODE_SUBNET" => "10.22.2.0/24"} 
+      node.vm.provision "route", type: "shell", path: "config_route.sh", env: {"CROSS_NODE_SUBNET" => "10.22.3.0/24", "CROSS_NODE_IP" => "10.100.198.202"} 
+      config.vm.provider "virtualbox" do |v|
+      	v.memory = 2048
+      	v.cpus = 2
+      end
+    end
+
+    config.vm.define "node2" do |node|
+      node.vm.hostname = "node2"
+      node.vm.network :private_network, ip: "10.100.198.202"
+      node.vm.provision :shell, inline: "sed 's/127\.0\.0\.1.*node2.*/10\.100\.198\.202 node2/' -i /etc/hosts"
+      node.vm.provision :shell, path: "bootstrap.sh"
+      node.vm.provision "join", type: "shell", path: "node.sh" 
+     # for basic CNI plugins
+      node.vm.provision "cni", type: "shell", path: "config_cni.sh", env: {"NODE_SUBNET" => "10.22.3.0/24"} 
+      node.vm.provision "route", type: "shell", path: "config_route.sh", env: {"CROSS_NODE_SUBNET" => "10.22.2.0/24", "CROSS_NODE_IP" => "10.100.198.201"} 
+      config.vm.provider "virtualbox" do |v|
+      	v.memory = 2048
+      	v.cpus = 2
+      end
+    end
+end
