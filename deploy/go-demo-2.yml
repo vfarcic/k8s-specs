@@ -2,6 +2,10 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: go-demo-2-db
+  labels:
+    type: db
+    service: go-demo-2
+    vendor: MongoLabs
 spec:
   selector:
     matchLabels:
@@ -39,6 +43,10 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: go-demo-2-api
+  labels:
+    type: api
+    service: go-demo-2
+    language: go
 spec:
   replicas: 3
   selector:

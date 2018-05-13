@@ -2,6 +2,10 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: different-app-db
+  labels:
+    type: db
+    service: different-app
+    vendor: MongoLabs
 spec:
   selector:
     matchLabels:
