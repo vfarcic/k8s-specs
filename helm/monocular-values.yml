@@ -1,0 +1,18 @@
+api:
+  config:
+    repos:
+      - name: stable
+        url: https://kubernetes-charts.storage.googleapis.com
+        source: https://github.com/kubernetes/charts/tree/master/stable
+  image:
+    tag: v0.7.0
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+ui:
+  image:
+    tag: v0.7.0

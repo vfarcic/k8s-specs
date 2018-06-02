@@ -1,0 +1,11 @@
+image:
+  tag: 2.6.2
+service:
+  type: NodePort
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 80m
+    memory: 64Mi
