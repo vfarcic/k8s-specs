@@ -1,7 +1,7 @@
 image:
   tag: 2.6.2
 service:
-  type: NodePort
+  type: LoadBalancer
 resources:
   limits:
     cpu: 100m
@@ -9,3 +9,5 @@ resources:
   requests:
     cpu: 80m
     memory: 64Mi
+persistence:
+  enabled: true
