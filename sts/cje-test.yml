@@ -1,0 +1,50 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: test
+spec:
+  serviceName: jenkins
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: test
+        image: alpine
+        command:
+          - sleep
+          - "1000000"
+        volumeMounts:
+        - name: test-data
+          mountPath: /tmp
+  volumeClaimTemplates:
+  - metadata:
+      name: test-data
+      # annotations:
+      #   volume.beta.kubernetes.io/storage-class: "cje-storage"
+    spec:
+      storageClassName: cje-storage
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: test
+spec:
+  selector:
+    app: test
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
