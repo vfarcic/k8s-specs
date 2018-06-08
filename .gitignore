@@ -5,3 +5,8 @@
 /kops-creds
 /kops/creds
 /prod.yml
+# terraform
+terraform/terraform.tf*
+terraform/*.pem
+terraform/plan
+terraform/.terraform
