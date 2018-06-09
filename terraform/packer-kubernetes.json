@@ -1,0 +1,46 @@
+{
+  "variables": {
+    "aws_region": "us-east-1",
+    "ami_name": "ami-kubernetes"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{ user `aws_region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "*ubuntu-xenial-16.04-amd64-server-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "{{ user `ami_name` }}-{{ isotime \"2006-01-02\" }}",
+    "force_deregister": true,
+    "tags": {
+        "Name": "{{ user `ami_name` }}-{{ isotime \"2006-01-02\" }}"
+    },
+    "snapshot_tags": {
+        "Name": "snapshot-{{ user `ami_name` }}"
+    }
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sudo apt-get clean",
+      "sudo apt-get update",
+      "sudo apt-get install -y apt-transport-https ca-certificates",
+      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+      "sudo apt-get update",
+      "sudo apt-get install -y docker-ce=17.06.2~ce-0~ubuntu",
+      "sudo usermod -aG docker ubuntu",
+      "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - ",
+      "sudo add-apt-repository \"deb http://apt.kubernetes.io/ kubernetes-xenial main\"",
+      "sudo apt-get update ",
+      "sudo apt-get install -y kubectl=1.9.7-00 kubeadm=1.9.7-00 kubelet=1.9.7-00"
+    ]
+  }]
+}
