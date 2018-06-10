@@ -1,0 +1,11 @@
+# vi: set ft=ruby :
+ 
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/xenial64"
+
+    config.vm.define "docker-build" do |node|
+      node.vm.hostname = "docker-build"
+      node.vm.network :private_network, ip: "10.100.198.200"
+      node.vm.provision :shell, inline: "apt update && apt install -y docker.io && apt install -y default-jre"
+    end
+end

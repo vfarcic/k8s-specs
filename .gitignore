@@ -5,3 +5,6 @@
 /kops-creds
 /kops/creds
 /prod.yml
+/cd/docker-build/.vagrant
+/cd/docker-build/*.log
+/helm/jenkins/*.lock

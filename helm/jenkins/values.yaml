@@ -1,6 +1,6 @@
 jenkins:
   Master:
-    ImageTag: "2.116-alpine"
+    ImageTag: "2.126-alpine"
     Cpu: "500m"
     Memory: "500Mi"
     ServiceType: ClusterIP
@@ -10,15 +10,20 @@ jenkins:
       - blueocean:1.5.0
       - credentials:2.1.16
       - ec2:1.39
-      - git:3.8.0
-      - git-client:2.7.1
-      - github:1.29.0
-      - kubernetes:1.5.1
-      - pipeline-utility-steps:2.0.2
-      - script-security:1.43
+      - git:3.9.1
+      - git-client:2.7.2
+      - github:1.29.1
+      - kubernetes:1.7.1
+      - pipeline-utility-steps:2.1.0
+      - script-security:1.44
       - slack:2.3
       - thinBackup:1.9
       - workflow-aggregator:2.5
+      - ssh-slaves:1.26
+      - ssh-agent:1.15
+      - jdk-tool:1.1
+      - command-launcher:1.2
+      - github-oauth:0.29
     Ingress:
       Annotations:
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -29,6 +34,7 @@ jenkins:
         ingress.kubernetes.io/proxy-request-buffering: "off"
     HostName: jenkins.acme.com
     CustomConfigMap: true
-    # AMI:
+    CredentialsXmlSecret: jenkins-credentials
+    SecretsFilesSecret: jenkins-secrets
   rbac:
     install: true

@@ -18,6 +18,7 @@ Master:
     - slack:2.3
     - thinBackup:1.9
     - workflow-aggregator:2.5
+    - ssh-slaves:1.26
   Ingress:
     Annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"

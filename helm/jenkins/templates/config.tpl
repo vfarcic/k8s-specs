@@ -74,7 +74,7 @@ data:
                   <envVars>
                     <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
                       <key>JENKINS_URL</key>
-                      <value>http://{{ template "jenkins.fullname" . }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</value>
+                      <value>http://{{ template "jenkins.fullname" . }}.{{ template "jenkins.fullname" . }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</value>
                     </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
                   </envVars>
                 </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
@@ -97,57 +97,13 @@ data:
           <serverUrl>https://kubernetes.default</serverUrl>
           <skipTlsVerify>false</skipTlsVerify>
           <namespace>{{ .Release.Namespace }}</namespace>
-          <jenkinsUrl>http://{{ template "jenkins.fullname" . }}.{{ .Release.Namespace }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</jenkinsUrl>
-          <jenkinsTunnel>{{ template "jenkins.fullname" . }}-agent.{{ .Release.Namespace }}:50000</jenkinsTunnel>
+          <jenkinsUrl>http://{{ template "jenkins.fullname" . }}.{{ template "jenkins.fullname" . }}:{{.Values.Master.ServicePort}}{{ default "" .Values.Master.JenkinsUriPrefix }}</jenkinsUrl>
+          <jenkinsTunnel>{{ template "jenkins.fullname" . }}-agent.{{ template "jenkins.fullname" . }}:50000</jenkinsTunnel>
           <containerCap>10</containerCap>
           <retentionTimeout>5</retentionTimeout>
           <connectTimeout>0</connectTimeout>
           <readTimeout>0</readTimeout>
         </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
-        <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.38">
-          <name>ec2-docker-agents</name>
-          <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
-          <credentialsId>aws</credentialsId>
-          <privateKey>
-            <privateKey></privateKey>
-          </privateKey>
-          <instanceCap>2147483647</instanceCap>
-          <templates>
-            <hudson.plugins.ec2.SlaveTemplate>
-              <ami>{{.Values.Master.AMI}}</ami>
-              <description>docker</description>
-              <zone></zone>
-              <securityGroups>docker</securityGroups>
-              <remoteFS></remoteFS>
-              <type>T2Micro</type>
-              <ebsOptimized>false</ebsOptimized>
-              <labels>docker</labels>
-              <mode>NORMAL</mode>
-              <initScript></initScript>
-              <tmpDir></tmpDir>
-              <userData></userData>
-              <numExecutors>1</numExecutors>
-              <remoteAdmin>ubuntu</remoteAdmin>
-              <jvmopts></jvmopts>
-              <subnetId></subnetId>
-              <idleTerminationMinutes>1</idleTerminationMinutes>
-              <iamInstanceProfile></iamInstanceProfile>
-              <deleteRootOnTermination>false</deleteRootOnTermination>
-              <useEphemeralDevices>false</useEphemeralDevices>
-              <customDeviceMapping></customDeviceMapping>
-              <instanceCap>2147483647</instanceCap>
-              <stopOnTerminate>false</stopOnTerminate>
-              <usePrivateDnsName>false</usePrivateDnsName>
-              <associatePublicIp>false</associatePublicIp>
-              <useDedicatedTenancy>false</useDedicatedTenancy>
-              <launchTimeout>2147483647</launchTimeout>
-              <connectBySSHProcess>false</connectBySSHProcess>
-              <connectUsingPublicIp>false</connectUsingPublicIp>
-              <node>true</node>
-            </hudson.plugins.ec2.SlaveTemplate>
-          </templates>
-          <region>us-east-2</region>
-        </hudson.plugins.ec2.EC2Cloud>
       </clouds>
       <quietPeriod>5</quietPeriod>
       <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
@@ -162,7 +118,19 @@ data:
       </views>
       <primaryView>All</primaryView>
       <slaveAgentPort>50000</slaveAgentPort>
+      <disabledAgentProtocols>
+{{- range .Values.Master.DisabledAgentProtocols }}
+        <string>{{ . }}</string>
+{{- end }}
+      </disabledAgentProtocols>
       <label></label>
+{{- if .Values.Master.CSRF.DefaultCrumbIssuer.Enabled }}
+      <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+{{- if .Values.Master.CSRF.DefaultCrumbIssuer.ProxyCompatability }}
+        <excludeClientIPFromCrumb>true</excludeClientIPFromCrumb>
+{{- end }}
+      </crumbIssuer>
+{{- end }}
       <nodeProperties/>
       <globalNodeProperties/>
       <noUsageStatistics>true</noUsageStatistics>
@@ -184,14 +152,49 @@ data:
       <pendingClasspathEntries/>
     </scriptApproval>
 {{- end }}
+  docker-build: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <slave>
+      <name>docker-build</name>
+      <description></description>
+      <remoteFS>/tmp</remoteFS>
+      <numExecutors>2</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher" plugin="ssh-slaves@1.26">
+        <host>10.100.198.200</host>
+        <port>22</port>
+        <credentialsId>docker-build</credentialsId>
+        <maxNumRetries>0</maxNumRetries>
+        <retryWaitTime>0</retryWaitTime>
+        <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy"/>
+      </launcher>
+      <label>docker ubuntu</label>
+      <nodeProperties/>
+    </slave>
+  jenkins.CLI.xml: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <jenkins.CLI>
+{{- if .Values.Master.CLI }}
+      <enabled>true</enabled>
+{{- else }}
+      <enabled>false</enabled>
+{{- end }}
+    </jenkins.CLI>
   apply_config.sh: |-
     mkdir -p /usr/share/jenkins/ref/secrets/;
     echo "false" > /usr/share/jenkins/ref/secrets/slave-to-master-security-kill-switch;
     cp -n /var/jenkins_config/config.xml /var/jenkins_home;
+    cp -n /var/jenkins_config/jenkins.CLI.xml /var/jenkins_home;
+    mkdir -p /var/jenkins_home/nodes/docker-build
+    cp /var/jenkins_config/docker-build /var/jenkins_home/nodes/docker-build/config.xml;
 {{- if .Values.Master.InstallPlugins }}
+    # Install missing plugins
     cp /var/jenkins_config/plugins.txt /var/jenkins_home;
     rm -rf /usr/share/jenkins/ref/plugins/*.lock
     /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;
+    # Copy plugins to shared volume
+    cp -n /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins;
 {{- end }}
 {{- if .Values.Master.ScriptApproval }}
     cp -n /var/jenkins_config/scriptapproval.xml /var/jenkins_home/scriptApproval.xml;
