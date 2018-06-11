@@ -13,3 +13,4 @@ terraform/terraform.tf*
 terraform/*.pem
 terraform/plan
 terraform/.terraform
+terraform/k8s-key*
