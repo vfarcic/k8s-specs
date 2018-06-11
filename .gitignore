@@ -5,14 +5,12 @@
 /kops-creds
 /kops/creds
 /prod.yml
-<<<<<<< HEAD
 /cd/docker-build/.vagrant
 /cd/docker-build/*.log
 /helm/jenkins/*.lock
-=======
 # terraform
 terraform/terraform.tf*
 terraform/*.pem
 terraform/plan
 terraform/.terraform
->>>>>>> a1b6bf8411d28613ddafc934b1deaf4a320cf5e4
+terraform/k8s-key*
