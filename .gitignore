@@ -9,8 +9,10 @@
 /cd/docker-build/*.log
 /helm/jenkins/*.lock
 # terraform
-terraform/terraform.tf*
-terraform/*.pem
-terraform/plan
-terraform/.terraform
-terraform/k8s-key*
+/terraform/terraform.tf*
+/terraform/*.pem
+/terraform/plan
+/terraform/.terraform
+/terraform/k8s-key*
+/terraform/*.log
+/terraform/admin.conf

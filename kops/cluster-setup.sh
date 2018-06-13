@@ -62,6 +62,19 @@ if [[ ! -z "${USE_HELM}" ]]; then
     kubectl -n kube-system rollout status deploy tiller-deploy
 fi
 
+echo "Waiting for ELB to become available..."
+sleep 30
+
+LB_HOST=$(kubectl -n kube-ingress \
+    get svc ingress-nginx \
+    -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+echo "ELB Host: $LB_HOST"
+
+LB_IP="$(dig +short $LB_HOST | tail -n 1)"
+
+echo "ELB IP: $LB_IP"
+
 echo ""
 echo "------------------------------------------"
 echo ""
@@ -73,3 +86,4 @@ echo "export KOPS_STATE_STORE=$KOPS_STATE_STORE"
 if ! [[ "$machine" == "Linux" || "$machine" == "Darwin" ]]; then
     echo "export KUBECONFIG=$KUBECONFIG"
 fi
+echo "export LB_IP=$LB_IP"
