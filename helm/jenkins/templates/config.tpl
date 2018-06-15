@@ -104,6 +104,56 @@ data:
           <connectTimeout>0</connectTimeout>
           <readTimeout>0</readTimeout>
         </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+        {{- if .Values.Master.DockerAMI }}
+        <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.39">
+          <name>ec2-docker-agents</name>
+          <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
+          <credentialsId>aws</credentialsId>
+          <privateKey>
+            <privateKey></privateKey>
+          </privateKey>
+          <instanceCap>2147483647</instanceCap>
+          <templates>
+            <hudson.plugins.ec2.SlaveTemplate>
+              <ami>{{.Values.Master.DockerAMI}}</ami>
+              <description>docker</description>
+              <zone></zone>
+              <securityGroups>docker</securityGroups>
+              <remoteFS></remoteFS>
+              <type>T2Micro</type>
+              <ebsOptimized>false</ebsOptimized>
+              <labels>docker</labels>
+              <mode>NORMAL</mode>
+              <initScript></initScript>
+              <tmpDir></tmpDir>
+              <userData></userData>
+              <numExecutors></numExecutors>
+              <remoteAdmin>ubuntu</remoteAdmin>
+              <jvmopts></jvmopts>
+              <subnetId></subnetId>
+              <idleTerminationMinutes>1</idleTerminationMinutes>
+              <iamInstanceProfile></iamInstanceProfile>
+              <deleteRootOnTermination>false</deleteRootOnTermination>
+              <useEphemeralDevices>false</useEphemeralDevices>
+              <customDeviceMapping></customDeviceMapping>
+              <instanceCap>2147483647</instanceCap>
+              <stopOnTerminate>false</stopOnTerminate>
+              <usePrivateDnsName>false</usePrivateDnsName>
+              <associatePublicIp>false</associatePublicIp>
+              <useDedicatedTenancy>false</useDedicatedTenancy>
+              <amiType class="hudson.plugins.ec2.UnixData">
+                <rootCommandPrefix></rootCommandPrefix>
+                <slaveCommandPrefix></slaveCommandPrefix>
+                <sshPort>22</sshPort>
+              </amiType>
+              <launchTimeout>2147483647</launchTimeout>
+              <connectBySSHProcess>false</connectBySSHProcess>
+              <connectUsingPublicIp>false</connectUsingPublicIp>
+            </hudson.plugins.ec2.SlaveTemplate>
+          </templates>
+          <region>us-east-2</region>
+        </hudson.plugins.ec2.EC2Cloud>
+        {{- end }}
       </clouds>
       <quietPeriod>5</quietPeriod>
       <scmCheckoutRetryCount>0</scmCheckoutRetryCount>

@@ -89,7 +89,9 @@ ssh -i k8s-key \
     "cat /etc/kubernetes/admin.conf" \
     | tee admin.conf
 
-export KUBECONFIG=/etc/kubernetes/admin.conf
+export KUBECONFIG=admin.conf
+
+kubectl get nodes
 ```
 
 ## To teardown the cluster

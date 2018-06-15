@@ -1,5 +1,5 @@
 Master:
-  ImageTag: "2.116-alpine"
+  ImageTag: "2.121.1-alpine"
   Cpu: "500m"
   Memory: "500Mi"
   ServiceType: ClusterIP
@@ -23,6 +23,7 @@ Master:
     - jdk-tool:1.1
     - command-launcher:1.2
     - github-oauth:0.29
+    - google-compute-engine:1.0.4
   Ingress:
     Annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"

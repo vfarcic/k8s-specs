@@ -1,6 +1,6 @@
 jenkins:
   Master:
-    ImageTag: "2.126-alpine"
+    ImageTag: "2.121.1-alpine"
     Cpu: "500m"
     Memory: "500Mi"
     ServiceType: ClusterIP
@@ -24,6 +24,7 @@ jenkins:
       - jdk-tool:1.1
       - command-launcher:1.2
       - github-oauth:0.29
+      - google-compute-engine:1.0.4
     Ingress:
       Annotations:
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -36,5 +37,7 @@ jenkins:
     CustomConfigMap: true
     CredentialsXmlSecret: jenkins-credentials
     SecretsFilesSecret: jenkins-secrets
+    # DockerAMI: 
+    # DockerEC2PrivateKey:
   rbac:
     install: true
