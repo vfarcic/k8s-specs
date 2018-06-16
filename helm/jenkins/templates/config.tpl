@@ -104,7 +104,7 @@ data:
           <connectTimeout>0</connectTimeout>
           <readTimeout>0</readTimeout>
         </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
-        {{- if .Values.Master.DockerAMI }}
+{{- if .Values.Master.DockerAMI }}
         <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.39">
           <name>ec2-docker-agents</name>
           <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
@@ -153,7 +153,59 @@ data:
           </templates>
           <region>us-east-2</region>
         </hudson.plugins.ec2.EC2Cloud>
-        {{- end }}
+{{- end }}
+{{- if .Values.Master.GProject }}
+        <com.google.jenkins.plugins.computeengine.ComputeEngineCloud plugin="google-compute-engine@1.0.4">
+          <name>gce-docker</name>
+          <instanceCap>2147483647</instanceCap>
+          <projectId>{{.Values.Master.GProject}}</projectId>
+          <credentialsId>{{.Values.Master.GProject}}</credentialsId>
+          <configurations>
+            <com.google.jenkins.plugins.computeengine.InstanceConfiguration>
+              <description>Docker build instances</description>
+              <namePrefix>docker</namePrefix>
+              <region>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/regions/us-east1</region>
+              <zone>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/zones/us-east1-b</zone>
+              <machineType>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/zones/us-east1-b/machineTypes/n1-standard-2</machineType>
+              <numExecutorsStr>1</numExecutorsStr>
+              <startupScript></startupScript>
+              <preemptible>false</preemptible>
+              <labels>docker ubuntu linux</labels>
+              <runAsUser>jenkins</runAsUser>
+              <bootDiskType>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/zones/us-east1-b/diskTypes/pd-ssd</bootDiskType>
+              <bootDiskAutoDelete>true</bootDiskAutoDelete>
+              <bootDiskSourceImageName>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/global/images/docker</bootDiskSourceImageName>
+              <bootDiskSourceImageProject>{{.Values.Master.GProject}}</bootDiskSourceImageProject>
+              <networkConfiguration class="com.google.jenkins.plugins.computeengine.AutofilledNetworkConfiguration">
+                <network>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/global/networks/default</network>
+                <subnetwork>default</subnetwork>
+              </networkConfiguration>
+              <externalAddress>false</externalAddress>
+              <useInternalAddress>false</useInternalAddress>
+              <networkTags></networkTags>
+              <serviceAccountEmail></serviceAccountEmail>
+              <mode>NORMAL</mode>
+              <retentionTimeMinutesStr>6</retentionTimeMinutesStr>
+              <launchTimeoutSecondsStr>300</launchTimeoutSecondsStr>
+              <bootDiskSizeGbStr>10</bootDiskSizeGbStr>
+              <googleLabels>
+                <entry>
+                  <string>jenkins_cloud_id</string>
+                  <string>-1723728540</string>
+                </entry>
+                <entry>
+                  <string>jenkins_config_name</string>
+                  <string>docker</string>
+                </entry>
+              </googleLabels>
+              <numExecutors>1</numExecutors>
+              <retentionTimeMinutes>6</retentionTimeMinutes>
+              <launchTimeoutSeconds>300</launchTimeoutSeconds>
+              <bootDiskSizeGb>10</bootDiskSizeGb>
+            </com.google.jenkins.plugins.computeengine.InstanceConfiguration>
+          </configurations>
+        </com.google.jenkins.plugins.computeengine.ComputeEngineCloud>
+{{- end }}
       </clouds>
       <quietPeriod>5</quietPeriod>
       <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
@@ -238,6 +290,10 @@ data:
     cp -n /var/jenkins_config/jenkins.CLI.xml /var/jenkins_home;
     mkdir -p /var/jenkins_home/nodes/docker-build
     cp /var/jenkins_config/docker-build /var/jenkins_home/nodes/docker-build/config.xml;
+{{- if .Values.Master.GAuthFile }}
+    mkdir -p /var/jenkins_home/gauth
+    cp -n /var/jenkins_secrets/{{.Values.Master.GAuthFile}} /var/jenkins_home/gauth;
+{{- end }}
 {{- if .Values.Master.InstallPlugins }}
     # Install missing plugins
     cp /var/jenkins_config/plugins.txt /var/jenkins_home;

@@ -26,6 +26,7 @@ Master:
     - google-compute-engine:1.0.4
   Ingress:
     Annotations:
+      kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
       nginx.ingress.kubernetes.io/proxy-body-size: 50m
       nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
