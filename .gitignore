@@ -16,3 +16,4 @@
 /terraform/k8s-key*
 /terraform/*.log
 /terraform/admin.conf
+/helm/jenkins/charts/*.tgz
