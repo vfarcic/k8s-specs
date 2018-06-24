@@ -39,8 +39,8 @@ jenkins:
     CredentialsXmlSecret: jenkins-credentials
     SecretsFilesSecret: jenkins-secrets
     # DockerAMI: 
-    # DockerEC2PrivateKey:
     # GProject:
     # GAuthFile:
   rbac:
     install: true
+    # roleBindingKind: RoleBinding

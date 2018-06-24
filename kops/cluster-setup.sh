@@ -63,7 +63,7 @@ if [[ ! -z "${USE_HELM}" ]]; then
 fi
 
 echo "Waiting for ELB to become available..."
-sleep 60
+sleep 90
 
 LB_HOST=$(kubectl -n kube-ingress \
     get svc ingress-nginx \

@@ -36,3 +36,4 @@ Master:
   HostName: jenkins.acme.com
 rbac:
   install: true
+  # roleBindingKind: RoleBinding
