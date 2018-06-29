@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: test
 spec:
-  serviceName: jenkins
+  serviceName: test
   selector:
     matchLabels:
       app: test
