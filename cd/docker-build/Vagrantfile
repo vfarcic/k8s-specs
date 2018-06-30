@@ -6,6 +6,12 @@ Vagrant.configure("2") do |config|
     config.vm.define "docker-build" do |node|
       node.vm.hostname = "docker-build"
       node.vm.network :private_network, ip: "10.100.198.200"
-      node.vm.provision :shell, inline: "apt update && apt install -y docker.io && apt install -y default-jre"
+      node.vm.provision :shell, inline: "sudo apt update"
+      node.vm.provision :shell, inline: "sudo apt install apt-transport-https ca-certificates curl software-properties-common"
+      node.vm.provision :shell, inline: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
+      node.vm.provision :shell, inline: "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\""
+      node.vm.provision :shell, inline: "sudo apt update"
+      node.vm.provision :shell, inline: "sudo apt install -y docker-ce"
+      node.vm.provision :shell, inline: "sudo apt install -y default-jre"
     end
 end
