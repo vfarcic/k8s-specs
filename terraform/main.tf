@@ -14,6 +14,8 @@ resource "digitalocean_droplet" "k8s_master" {
     inline = [
       "sysctl net.bridge.bridge-nf-call-iptables=1",
       "kubeadm init --pod-network-cidr=\"10.244.0.0/16\" | sudo tee /opt/kube-init.log",
+      "export KUBECONFIG=/etc/kubernetes/admin.conf",
+      "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml",
     ]
 
     connection {
