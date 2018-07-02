@@ -89,7 +89,9 @@ ssh -i k8s-key \
     "cat /etc/kubernetes/admin.conf" \
     | tee admin.conf
 
-export KUBECONFIG=admin.conf
+cd ../
+
+export KUBECONFIG=terraform/admin.conf
 
 kubectl get nodes
 ```
