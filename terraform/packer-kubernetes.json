@@ -24,7 +24,8 @@
       "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - ",
       "sudo add-apt-repository \"deb http://apt.kubernetes.io/ kubernetes-xenial main\"",
       "sudo apt-get update ",
-      "sudo apt-get install -y kubectl=1.9.7-00 kubeadm=1.9.7-00 kubelet=1.9.7-00"
+      "sudo apt-get install -y kubectl=1.9.7-00 kubeadm=1.9.7-00 kubelet=1.9.7-00 python-pip",
+      "pip install s3cmd"
     ]
   }]
 }

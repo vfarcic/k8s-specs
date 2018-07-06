@@ -27,41 +27,27 @@ Create a key pair:
 ssh-keygen -t rsa -P "" -f ./k8s-key
 ```
 
-Create the master node:
+Create the cluster 
 
 ```bash
 export TF_VAR_token=$DIGITALOCEAN_API_TOKEN
-
 export TF_VAR_k8s_snapshot_id=$(grep \
     'artifact,0,id' \
     packer-kubernetes.log \
     | cut -d: -f2)
+export TF_VAR_do_space="<your_do_space>"
+export TF_VAR_space_access_key="<your_space_access_key>"
+export TF_VAR_space_secret_key="<your_space_secret_key>"
+
 
 terraform init
 
 terraform plan \
-    -target="digitalocean_droplet.k8s_master" \
     -out plan
 
 terraform apply plan
 ```
 
-Once the master node is up and running. You can Provision and Join the two nodes to the cluster:
-
-```bash
-ssh-keyscan \
-    $(terraform output master-ip) \
-    >> ~/.ssh/known_hosts
-
-export TF_VAR_k8s_join_command=$(ssh \
-    -i k8s-key \
-    root@$(terraform output master-ip) \
-    "kubeadm token create --print-join-command")
-
-terraform plan -out plan
-
-terraform apply plan
-```
 
 Log into your new K8s cluster:
 
@@ -75,10 +61,10 @@ kubectl get nodes
 ```
 
 ```
-NAME         STATUS     ROLES     AGE       VERSION
-k8s-master   NotReady   master    5m        v1.9.7
-k8s-node-1   NotReady   <none>    1m        v1.9.7
-k8s-node-2   NotReady   <none>    1m        v1.9.7
+NAME         STATUS    ROLES     AGE       VERSION
+k8s-master   Ready     master    2m        v1.9.7
+k8s-node-1   Ready     <none>    1m        v1.9.7
+k8s-node-2   Ready     <none>    1m        v1.9.7
 ```
 
 ```bash
@@ -99,5 +85,16 @@ kubectl get nodes
 ## To teardown the cluster
 
 ```bash
-terraform destroy --force
+terraform destroy -force
+```
+
+## To modify the number of nodes
+
+```bash
+export TF_VAR_k8s_nodes=3
+
+terraform plan \
+    -out plan
+
+terraform apply plan
 ```
