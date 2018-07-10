@@ -31,14 +31,17 @@ Create the cluster
 
 ```bash
 export TF_VAR_token=$DIGITALOCEAN_API_TOKEN
+
 export TF_VAR_k8s_snapshot_id=$(grep \
     'artifact,0,id' \
     packer-kubernetes.log \
     | cut -d: -f2)
-export TF_VAR_do_space="<your_do_space>"
-export TF_VAR_space_access_key="<your_space_access_key>"
-export TF_VAR_space_secret_key="<your_space_secret_key>"
 
+export TF_VAR_do_space="<your_do_space>"
+
+export TF_VAR_space_access_key="<your_space_access_key>"
+
+export TF_VAR_space_secret_key="<your_space_secret_key>"
 
 terraform init
 
@@ -85,6 +88,8 @@ kubectl get nodes
 ## To teardown the cluster
 
 ```bash
+cd  terrraform
+
 terraform destroy -force
 ```
 

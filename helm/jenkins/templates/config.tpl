@@ -294,6 +294,9 @@ data:
     mkdir -p /var/jenkins_home/gauth
     cp -n /var/jenkins_secrets/{{.Values.Master.GAuthFile}} /var/jenkins_home/gauth;
 {{- end }}
+{{- if .Values.Master.GlobalLibraries }}
+    cp -n /var/jenkins_secrets/org.jenkinsci.plugins.workflow.libs.GlobalLibraries.xml /var/jenkins_home;
+{{- end }}
 {{- if .Values.Master.InstallPlugins }}
     # Install missing plugins
     cp /var/jenkins_config/plugins.txt /var/jenkins_home;

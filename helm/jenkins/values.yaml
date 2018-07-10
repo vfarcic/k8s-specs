@@ -7,7 +7,7 @@ jenkins:
     ServiceAnnotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     InstallPlugins:
-    - blueocean:1.6.1
+    - blueocean:1.6.2
     - credentials:2.1.17
     - ec2:1.39
     - git:3.9.1
@@ -15,6 +15,7 @@ jenkins:
     - github:1.29.2
     - kubernetes:1.9.2
     - pipeline-utility-steps:2.1.0
+    - pipeline-model-definition:1.3.1
     - script-security:1.44
     - slack:2.3
     - thinBackup:1.9
@@ -41,6 +42,7 @@ jenkins:
     # DockerAMI: 
     # GProject:
     # GAuthFile:
+    # GlobalLibraries: true
   rbac:
     install: true
     # roleBindingKind: RoleBinding

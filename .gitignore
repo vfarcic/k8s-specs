@@ -17,3 +17,4 @@
 /terraform/*.log
 /terraform/admin.conf
 /helm/jenkins/charts/*.tgz
+terraform.tfstate
