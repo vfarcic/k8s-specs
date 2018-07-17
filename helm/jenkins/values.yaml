@@ -39,6 +39,7 @@ jenkins:
     CustomConfigMap: true
     CredentialsXmlSecret: jenkins-credentials
     SecretsFilesSecret: jenkins-secrets
+    DockerVM: false
     # DockerAMI: 
     # GProject:
     # GAuthFile:

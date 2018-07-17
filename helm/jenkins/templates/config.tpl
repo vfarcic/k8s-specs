@@ -131,7 +131,7 @@ data:
               <remoteAdmin>ubuntu</remoteAdmin>
               <jvmopts></jvmopts>
               <subnetId></subnetId>
-              <idleTerminationMinutes>1</idleTerminationMinutes>
+              <idleTerminationMinutes>10</idleTerminationMinutes>
               <iamInstanceProfile></iamInstanceProfile>
               <deleteRootOnTermination>false</deleteRootOnTermination>
               <useEphemeralDevices>false</useEphemeralDevices>
@@ -254,6 +254,7 @@ data:
       <pendingClasspathEntries/>
     </scriptApproval>
 {{- end }}
+{{- if .Values.Master.DockerVM }}
   docker-build: |-
     <?xml version='1.1' encoding='UTF-8'?>
     <slave>
@@ -274,6 +275,7 @@ data:
       <label>docker ubuntu</label>
       <nodeProperties/>
     </slave>
+{{- end }}
   jenkins.CLI.xml: |-
     <?xml version='1.1' encoding='UTF-8'?>
     <jenkins.CLI>
@@ -288,8 +290,10 @@ data:
     echo "false" > /usr/share/jenkins/ref/secrets/slave-to-master-security-kill-switch;
     cp -n /var/jenkins_config/config.xml /var/jenkins_home;
     cp -n /var/jenkins_config/jenkins.CLI.xml /var/jenkins_home;
+{{- if .Values.Master.DockerVM }}
     mkdir -p /var/jenkins_home/nodes/docker-build
     cp /var/jenkins_config/docker-build /var/jenkins_home/nodes/docker-build/config.xml;
+{{- end }}
 {{- if .Values.Master.GAuthFile }}
     mkdir -p /var/jenkins_home/gauth
     cp -n /var/jenkins_secrets/{{.Values.Master.GAuthFile}} /var/jenkins_home/gauth;
