@@ -25,6 +25,7 @@ Master:
   - command-launcher:1.2
   - github-oauth:0.29
   - google-compute-engine:1.0.4
+  - pegdown-formatter:1.3
   Ingress:
     Annotations:
       kubernetes.io/ingress.class: "nginx"
