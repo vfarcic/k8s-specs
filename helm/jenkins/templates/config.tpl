@@ -180,8 +180,8 @@ data:
                 <network>https://www.googleapis.com/compute/v1/projects/{{.Values.Master.GProject}}/global/networks/default</network>
                 <subnetwork>default</subnetwork>
               </networkConfiguration>
-              <externalAddress>false</externalAddress>
-              <useInternalAddress>false</useInternalAddress>
+              <externalAddress>true</externalAddress>
+              <useInternalAddress>true</useInternalAddress>
               <networkTags></networkTags>
               <serviceAccountEmail></serviceAccountEmail>
               <mode>NORMAL</mode>
