@@ -73,6 +73,21 @@ echo "ELB Host: $LB_HOST"
 
 LB_IP="$(dig +short $LB_HOST | tail -n 1)"
 
+if [[ ! -z "${USE_CM}" ]]; then
+    export CM_ADDR="cm.$LB_IP.nip.io"
+    echo $CM_ADDR
+    CM_ADDR_ESC=$(echo $CM_ADDR | sed -e "s@\.@\\\.@g")
+    echo $CM_ADDR_ESC
+    helm install stable/chartmuseum \
+        --namespace charts \
+        --name cm \
+        --values helm/chartmuseum-values.yml \
+        --set ingress.hosts."$CM_ADDR_ESC"={"/"} \
+        --set env.secret.BASIC_AUTH_USER=admin \
+        --set env.secret.BASIC_AUTH_PASS=admin
+    kubectl -n charts rollout status deploy cm-chartmuseum
+fi
+
 echo "ELB IP: $LB_IP"
 
 echo ""
