@@ -47,4 +47,4 @@ jenkins:
     # GlobalLibraries: true
   rbac:
     install: true
-    # roleBindingKind: RoleBinding
+    roleBindingKind: RoleBinding
