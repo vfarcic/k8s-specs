@@ -6,6 +6,8 @@ Master:
   ServiceAnnotations:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
   InstallPlugins:
+  - durable-task:1.22
+  - workflow-durable-task-step:2.19
   - blueocean:1.7.1
   - credentials:2.1.18
   - ec2:1.39
