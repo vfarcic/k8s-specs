@@ -18,3 +18,4 @@
 /terraform/admin.conf
 /helm/jenkins/charts/*.tgz
 terraform.tfstate
+.DS_Store
