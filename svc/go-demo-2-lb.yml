@@ -1,0 +1,83 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: go-demo-2-db
+spec:
+  selector:
+    matchLabels:
+      type: db
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: db
+        service: go-demo-2
+        vendor: MongoLabs
+    spec:
+      containers:
+      - name: db
+        image: mongo:3.3
+        ports:
+        - containerPort: 28017
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-db
+spec:
+  ports:
+  - port: 27017
+  selector:
+    type: db
+    service: go-demo-2
+
+---
+
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: go-demo-2-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: api
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: api
+        service: go-demo-2
+        language: go
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-2
+        env:
+        - name: DB
+          value: go-demo-2-db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-api
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    type: api
+    service: go-demo-2
