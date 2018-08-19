@@ -15,7 +15,7 @@ jenkins:
     - git:3.9.1
     - git-client:2.7.3
     - github:1.29.2
-    - kubernetes:1.12.0
+    - kubernetes:1.12.3
     - pipeline-utility-steps:2.1.0
     - pipeline-model-definition:1.3.1
     - script-security:1.44
