@@ -6,7 +6,7 @@ spec:
   type: NodePort
   ports:
   - port: 28017
-    nodePort: 30012
+    nodePort: 30001
     protocol: TCP
   selector:
     type: backend
