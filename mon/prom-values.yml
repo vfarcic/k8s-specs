@@ -1,16 +1,42 @@
 server:
   ingress:
     enabled: true
-serverFiles:
-  alerts:
-    groups:
-    - name: alert.rules
-      rules:
-      - alert: k8s-node-down
-        expr: sum(up{job="kubernetes-nodes", kubernetes_io_role="master"}) < 3
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "Insufficient number of masters",
-          description: "Prometheus detected less than 3 masters",
+  resources:
+    limits:
+      cpu: 400m
+      memory: 200Mi
+    requests:
+      cpu: 200m
+      memory: 130Mi
+pushgateway:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi
+nodeExporter:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi
+kubeStateMetrics:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi
+alertmanager:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi

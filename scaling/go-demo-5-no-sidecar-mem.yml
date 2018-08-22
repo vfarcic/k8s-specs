@@ -1,0 +1,184 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: go-demo-5
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api
+  namespace: go-demo-5
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /demo
+        backend:
+          serviceName: api
+          servicePort: 8080
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db
+  namespace: go-demo-5
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: db
+  namespace: go-demo-5
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: db
+  namespace: go-demo-5
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: db
+subjects:
+- kind: ServiceAccount
+  name: db
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: go-demo-5
+spec:
+  serviceName: db
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      serviceAccountName: db
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: db
+        image: mongo:3.3
+        command:
+          - mongod
+          - "--replSet"
+          - rs0
+          - "--smallfiles"
+          - "--noprealloc"
+        ports:
+          - containerPort: 27017
+        resources:
+          limits:
+            memory: "150Mi"
+            cpu: 0.2
+          requests:
+            memory: "100Mi"
+            cpu: 0.1
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+      - name: db-sidecar
+        image: cvallance/mongo-k8s-sidecar
+        env:
+        - name: MONGO_SIDECAR_POD_LABELS
+          value: "app=db"
+        - name: KUBE_NAMESPACE
+          value: go-demo-5
+        - name: KUBERNETES_MONGO_SERVICE_NAME
+          value: db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: go-demo-5
+spec:
+  ports:
+  - port: 27017
+  clusterIP: None
+  selector:
+    app: db
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: go-demo-5
+spec:
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-5
+        env:
+        - name: DB
+          value: db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+        resources:
+          limits:
+            memory: 15Mi
+            cpu: 0.1
+          requests:
+            memory: 10Mi
+            cpu: 0.01
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: go-demo-5
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: api

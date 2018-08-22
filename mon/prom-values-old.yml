@@ -1,0 +1,16 @@
+server:
+  ingress:
+    enabled: true
+serverFiles:
+  alerts:
+    groups:
+    - name: alert.rules
+      rules:
+      - alert: k8s-node-down
+        expr: sum(up{job="kubernetes-nodes", kubernetes_io_role="master"}) < 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Insufficient number of masters",
+          description: "Prometheus detected less than 3 masters",
