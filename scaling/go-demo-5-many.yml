@@ -140,7 +140,7 @@ spec:
 
 ---
 
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: db
@@ -216,7 +216,7 @@ spec:
 
 ---
 
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: api
