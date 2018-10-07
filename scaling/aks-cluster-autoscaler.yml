@@ -120,7 +120,7 @@ spec:
     spec:
       serviceAccountName: cluster-autoscaler
       containers:
-      - image: k8s.gcr.io/cluster-autoscaler:v1.2.2
+      - image: k8s.gcr.io/cluster-autoscaler:v1.3.3
         imagePullPolicy: Always
         name: cluster-autoscaler
         resources:

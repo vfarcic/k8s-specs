@@ -1,0 +1,71 @@
+server:
+  ingress:
+    enabled: true
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 1000Mi
+    requests:
+      cpu: 10m
+      memory: 500Mi
+alertmanager:
+  ingress:
+    enabled: true
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+kubeStateMetrics:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 5m
+      memory: 25Mi
+nodeExporter:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+pushgateway:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+serverFiles:
+  alerts:
+    groups:
+    - name: nodes
+      rules:
+      - alert: TooManyNodes
+        expr: count(kube_node_info) > 3
+        for: 15m
+        labels:
+          severity: notify
+        annotations:
+          summary: Cluster increased
+          description: The number of the nodes in the cluster increased
+      - alert: TooFewNodes
+        expr: count(kube_node_info) < 1
+        for: 15m
+        labels:
+          severity: notify
+        annotations:
+          summary: Cluster decreased
+          description: The number of the nodes in the cluster decreased

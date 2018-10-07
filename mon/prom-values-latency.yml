@@ -1,0 +1,102 @@
+server:
+  ingress:
+    enabled: true
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 1000Mi
+    requests:
+      cpu: 10m
+      memory: 500Mi
+alertmanager:
+  ingress:
+    enabled: true
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+kubeStateMetrics:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 5m
+      memory: 25Mi
+nodeExporter:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+pushgateway:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 5m
+      memory: 10Mi
+serverFiles:
+  alerts:
+    groups:
+    - name: latency
+      rules:
+      - alert: AppTooSlow
+        expr: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{le="0.25"}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_request_duration_seconds_count[5m])) by (ingress) < 0.95
+        labels:
+          severity: notify
+        annotations:
+          summary: Application is too slow
+          description: More then 5% of requests are slower than 0.25s
+    - name: nodes
+      rules:
+      - alert: TooManyNodes
+        expr: count(kube_node_info) > 3
+        for: 1m
+        labels:
+          severity: notify
+        annotations:
+          summary: Cluster increased
+          description: The number of the nodes in the cluster increased
+      - alert: TooFewNodes
+        expr: count(kube_node_info) < 1
+        for: 1m
+        labels:
+          severity: notify
+        annotations:
+          summary: Cluster decreased
+          description: The number of the nodes in the cluster decreased
+alertmanagerFiles:
+  alertmanager.yml:
+    global: {}
+    route:
+      group_wait: 10s
+      group_interval: 5m
+      receiver: slack
+      repeat_interval: 3h
+      routes:
+      - receiver: slack
+        repeat_interval: 5d
+        match:
+          severity: notify
+          frequency: low
+    receivers:
+    - name: slack
+      slack_configs:
+      - api_url: "https://hooks.slack.com/services/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"
+        send_resolved: true
+        title: "{{ .CommonAnnotations.summary }}"
+        text: "{{ .CommonAnnotations.description }}"
+        title_link: https://my-prometheus.com/alerts
