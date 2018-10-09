@@ -128,7 +128,7 @@ serverFiles:
     - name: errors
       rules:
       - alert: TooManyErrors
-        expr: sum(rate(nginx_ingress_controller_requests{status=~"4..|5.."}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_requests[5m])) by (ingress) > 0.05
+        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_requests[5m])) by (ingress) > 0.05
         labels:
           severity: error
         annotations:

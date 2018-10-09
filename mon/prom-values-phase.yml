@@ -71,7 +71,7 @@ serverFiles:
       rules:
       - alert: TooManyNodes
         expr: count(kube_node_info) > 3
-        for: 15m
+        for: 1m
         labels:
           severity: notify
         annotations:
@@ -79,7 +79,7 @@ serverFiles:
           description: The number of the nodes in the cluster increased
       - alert: TooFewNodes
         expr: count(kube_node_info) < 1
-        for: 15m
+        for: 1m
         labels:
           severity: notify
         annotations:
@@ -138,65 +138,12 @@ serverFiles:
       rules:
       - alert: ProblematicPods
         expr: sum(kube_pod_status_phase{phase=~"Failed|Unknown|Pending"}) by (phase) > 0
-        for: 15m
+        for: 1m
         labels:
           severity: notify
         annotations:
           summary: At least one Pod could not run
           description: At least one Pod is in a problematic phase
-      - alert: OldPods
-        expr: (time() - kube_pod_start_time{namespace!="kube-system"}) > (60 * 60 * 24 * 90)
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Old Pods
-          description: At least one Pod has not be updated to more than 90 days
-      - alert: ReservedMemTooLow
-        expr: sum(label_join(container_memory_usage_bytes{namespace!="kube-system", namespace!="ingress-nginx"}, "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace!="kube-system"}) by (pod) > 1.5
-        for: 1h
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Reserved memory is too low
-          description: At least one Pod uses much more memory than it reserved
-      - alert: ReservedMemTooHigh
-        expr: sum(label_join(container_memory_usage_bytes{namespace!="kube-system", namespace!="ingress-nginx"}, "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace!="kube-system"}) by (pod) < 0.5 and sum(kube_pod_container_resource_requests_memory_bytes{namespace!="kube-system"}) by (pod) > 5.25e+06
-        for: 6h
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Reserved memory is too high
-          description: At least one Pod uses much less memory than it reserved
-      - alert: ReservedCPUTooLow
-        expr: sum(label_join(rate(container_cpu_usage_seconds_total{namespace!="kube-system", namespace!="ingress-nginx", pod_name!=""}[5m]), "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_requests_cpu_cores{namespace!="kube-system"}) by (pod) > 1.5 and sum(kube_pod_container_resource_requests_cpu_cores{namespace!="kube-system"}) by (pod) > 0.005
-        for: 1h
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Reserved CPU is too low
-          description: At least one Pod uses much more CPU than it reserved
-      - alert: ReservedCPUTooHigh
-        expr: sum(label_join(rate(container_cpu_usage_seconds_total{namespace!="kube-system", pod_name!=""}[5m]), "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_requests_cpu_cores{namespace!="kube-system"}) by (pod) < 0.5 and sum(kube_pod_container_resource_requests_cpu_cores{namespace!="kube-system"}) by (pod) > 0.005
-        for: 6h
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Reserved CPU is too high
-          description: At least one Pod uses much less CPU than it reserved
-      - alert: MemoryAtTheLimit
-        expr: sum(label_join(container_memory_usage_bytes{namespace!="kube-system"}, "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace!="kube-system"}) by (pod) > 0.8
-        for: 1h
-        labels:
-          severity: notify
-          frequency: low
-        annotations:
-          summary: Memory usage is almost at the limit
-          description: At least one Pod uses memory that is close it its limit
 alertmanagerFiles:
   alertmanager.yml:
     global: {}

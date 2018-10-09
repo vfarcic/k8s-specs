@@ -71,7 +71,7 @@ serverFiles:
       rules:
       - alert: TooManyNodes
         expr: count(kube_node_info) > 3
-        for: 15m
+        for: 1m
         labels:
           severity: notify
         annotations:
@@ -79,7 +79,7 @@ serverFiles:
           description: The number of the nodes in the cluster increased
       - alert: TooFewNodes
         expr: count(kube_node_info) < 1
-        for: 15m
+        for: 1m
         labels:
           severity: notify
         annotations:
