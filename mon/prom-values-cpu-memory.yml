@@ -146,4 +146,4 @@ alertmanagerFiles:
         send_resolved: true
         title: "{{ .CommonAnnotations.summary }}"
         text: "{{ .CommonAnnotations.description }}"
-        title_link: https://my-prometheus.com/alerts
+        title_link: http://my-prometheus.com/alerts
