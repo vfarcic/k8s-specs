@@ -128,7 +128,7 @@ serverFiles:
     - name: errors
       rules:
       - alert: TooManyErrors
-        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_requests[5m])) by (ingress) > 0.05
+        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_requests[5m])) by (ingress) > 0.025
         labels:
           severity: error
         annotations:
@@ -151,7 +151,7 @@ serverFiles:
           frequency: low
         annotations:
           summary: Old Pods
-          description: At least one Pod has not be updated to more than 90 days
+          description: At least one Pod has not been updated to more than 90 days
       - alert: ReservedMemTooLow
         expr: sum(label_join(container_memory_usage_bytes{namespace!="kube-system", namespace!="ingress-nginx"}, "pod", ",", "pod_name")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace!="kube-system"}) by (pod) > 1.5
         for: 1m
