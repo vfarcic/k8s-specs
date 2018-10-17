@@ -59,7 +59,7 @@ serverFiles:
           severity: notify
         annotations:
           summary: Application is too slow
-          description: More then 5 percent of requests are slower than 0.25s
+          description: More then 5% of requests are slower than 0.25s
     - name: nodes
       rules:
       - alert: TooManyNodes

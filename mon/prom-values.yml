@@ -59,7 +59,7 @@ serverFiles:
           severity: notify
         annotations:
           summary: Application is too slow
-          description: More then 5 percent of requests are slower than 0.25s
+          description: More then 5% of requests are slower than 0.25s
       - alert: TooManyRequests
         expr: sum(rate(nginx_ingress_controller_requests[5m])) by (ingress) / sum(label_join(kube_deployment_status_replicas, "ingress", ",", "deployment")) by (ingress) > 1
         labels:
@@ -133,7 +133,7 @@ serverFiles:
           severity: error
         annotations:
           summary: Too many errors
-          description: At least one application produced more then 5 percent of error responses
+          description: At least one application produced more then 5% of error responses
     - name: pods
       rules:
       - alert: ProblematicPods
