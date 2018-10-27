@@ -1,0 +1,43 @@
+image:
+  tag: v0.2.2
+metricsRelistInterval: 90s
+prometheus:
+  url: http://prometheus-server.metrics.svc
+  port: 80
+rules:
+  default: false
+  custom:
+  - seriesQuery: 'http_server_resp_time_count{kubernetes_namespace!="",kubernetes_name!=""}'
+    resources:
+      overrides:
+        kubernetes_namespace: {resource: "namespace"}
+        kubernetes_name: {resource: "service"}
+    name:
+      matches: "^(.*)server_resp_time_count"
+      as: "${1}req_per_second"
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>)'
+  - seriesQuery: 'http_server_resp_time_count{kubernetes_namespace!="",kubernetes_name!=""}'
+    resources:
+      overrides:
+        kubernetes_namespace: {resource: "namespace"}
+        kubernetes_name: {resource: "service"}
+    name:
+      matches: "^(.*)server_resp_time_count"
+      as: "${1}req_per_second_per_replica"
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>) / count(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+  - seriesQuery: 'nginx_ingress_controller_requests'
+    resources:
+      overrides:
+        namespace: {resource: "namespace"}
+        ingress: {resource: "ingress"}
+    name:
+      as: "http_req_per_second"
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>)'
+  - seriesQuery: 'nginx_ingress_controller_requests'
+    resources:
+      overrides:
+        namespace: {resource: "namespace"}
+        ingress: {resource: "ingress"}
+    name:
+      as: "http_req_per_second_per_replica"
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>) / sum(label_join(kube_deployment_status_replicas, "ingress", ",", "deployment")) by (<<.GroupBy>>)'

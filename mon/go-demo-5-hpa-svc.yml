@@ -1,0 +1,19 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: go-demo-5
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: go-demo-5
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Object
+    object:
+      metricName: http_req_per_second_per_replica
+      target:
+        kind: Service
+        name: go-demo-5
+      targetValue: 1500m
