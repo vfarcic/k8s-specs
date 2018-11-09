@@ -1,0 +1,51 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: manual-ebs-01
+  labels:
+    type: ebs
+spec:
+  storageClassName: manual-ebs
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: REPLACE_ME_1
+    fsType: ext4
+
+---
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: manual-ebs-02
+  labels:
+    type: ebs
+spec:
+  storageClassName: manual-ebs
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: REPLACE_ME_2
+    fsType: ext4
+
+---
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: manual-ebs-03
+  labels:
+    type: ebs
+spec:
+  storageClassName: manual-ebs
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: REPLACE_ME_3
+    fsType: ext4
