@@ -4,7 +4,6 @@ image:
 ingress:
   enabled: false
 service:
-  # Change to NodePort if ingress.enable=false
   type: NodePort
 rbac:
   enabled: true
