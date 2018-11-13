@@ -1,0 +1,20 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.kubemonkey.name }}
+  namespace: {{ .Values.kubemonkey.namespace }}
+data:
+  config.toml: |
+    [kubemonkey]
+    run_hour = {{ .Values.kubemonkey.runhour }}
+    start_hour = {{ .Values.kubemonkey.starthour }}
+    end_hour = {{ .Values.kubemonkey.endhour }}
+    blacklisted_namespaces = ["{{ .Values.kubemonkey.blacklistednamespaces }}"]
+    whitelisted_namespaces = ["{{ .Values.kubemonkey.whitelistednamespaces }}"]
+    time_zone = "{{ .Values.kubemonkey.timezone }}"
+    graceperiod_sec= {{ .Values.kubemonkey.graceperiodsec }}
+    [debug]
+    enabled= {{ .Values.kubemonkey.debug.enabled }}
+    schedule_immediate_kill= {{ .Values.kubemonkey.debug.scheduleimmediatekill }}

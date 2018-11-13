@@ -1,0 +1,13 @@
+name: kube-monkey
+version: 0.2.3
+apiVersion: v1
+description: kube-monkey is an implementation of Netflix's Chaos Monkey for Kubernetes clusters. It randomly deletes Kubernetes (k8s) pods in the cluster encouraging and validating the development of failure-resilient services.
+keywords:
+- K8s
+- kube-monkey
+home: https://github.com/asobti/kube-monkey
+sources:
+- https://github.com/asobti/kube-monkey
+maintainers:
+- name: asobti
+  email: n/a

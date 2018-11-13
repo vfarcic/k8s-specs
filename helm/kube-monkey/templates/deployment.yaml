@@ -1,0 +1,28 @@
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "helm.fullname" . }}
+  namespace: {{ .Values.kubemonkey.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "helm.fullname" . }}
+    spec:
+      containers:
+        -  name: {{ .Values.kubemonkey.name }}
+           command:
+             - "/kube-monkey"
+           args: ["-v=5", "-log_dir=/var/log/kube-monkey"]
+           image: ayushsobti/kube-monkey:v0.2.3
+           volumeMounts:
+             - name: config-volume
+               mountPath: "/etc/kube-monkey"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Values.kubemonkey.name }}
+      serviceAccountName: {{ .Values.kubemonkey.name }}

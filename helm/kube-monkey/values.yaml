@@ -1,0 +1,31 @@
+replicaCount: 3
+image:
+  tag: latest
+ingress:
+  enabled: false
+service:
+  # Change to NodePort if ingress.enable=false
+  type: NodePort
+rbac:
+  enabled: true
+resources:
+  limits:
+   cpu: 0.2
+   memory: 20Mi
+  requests:
+   cpu: 0.1
+   memory: 10Mi
+#refer to https://github.com/asobti/kube-monkey for details about below attributes
+kubemonkey:
+  runhour: 10
+  starthour: 11
+  endhour: 14
+  blacklistednamespaces: "kube-system" #multiples can be declared ex : "xxx","yyy"
+  whitelistednamespaces: "go-demo-5" #multiples can be declared ex : "xxx","yyy"
+  timezone: "Australia/Melbourne"
+  graceperiodsec: 10
+  namespace: "kube-system"
+  name: "kube-monkey"
+  debug:
+   enabled: true
+   scheduleimmediatekill: true
