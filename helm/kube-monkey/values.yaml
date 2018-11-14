@@ -14,6 +14,8 @@ resources:
   requests:
    cpu: 0.1
    memory: 10Mi
+namespace: "kube-system"
+name: "kube-monkey"
 #refer to https://github.com/asobti/kube-monkey for details about below attributes
 kubemonkey:
   runhour: 10
@@ -23,8 +25,6 @@ kubemonkey:
   whitelistednamespaces: "go-demo-5" #multiples can be declared ex : "xxx","yyy"
   timezone: "Australia/Melbourne"
   graceperiodsec: 10
-  namespace: "kube-system"
-  name: "kube-monkey"
   debug:
    enabled: true
    scheduleimmediatekill: true

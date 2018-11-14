@@ -1,3 +1,4 @@
 1. Wait until the application is rolled out:
-  kubectl -n {{ .Values.kubemonkey.namespace }} rollout status deployment {{ template "helm.fullname" . }}
-
+  kubectl -n {{ .Values.namespace }} rollout status deployment {{ template "helm.fullname" . }}
+2. Check the logs:
+  kubectl logs -f deployment.apps/{{ .Values.name }} -n {{ .Values.namespace }}

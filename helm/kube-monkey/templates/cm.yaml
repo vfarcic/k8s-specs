@@ -3,8 +3,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.kubemonkey.name }}
-  namespace: {{ .Values.kubemonkey.namespace }}
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
 data:
   config.toml: |
     [kubemonkey]

@@ -4,7 +4,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "helm.fullname" . }}
-  namespace: {{ .Values.kubemonkey.namespace }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
@@ -13,7 +13,7 @@ spec:
         app: {{ template "helm.fullname" . }}
     spec:
       containers:
-        -  name: {{ .Values.kubemonkey.name }}
+        -  name: {{ .Values.name }}
            command:
              - "/kube-monkey"
            args: ["-v=5", "-log_dir=/var/log/kube-monkey"]
@@ -24,5 +24,5 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: {{ .Values.kubemonkey.name }}
-      serviceAccountName: {{ .Values.kubemonkey.name }}
+            name: {{ .Values.name }}
+      serviceAccountName: {{ .Values.name }}
