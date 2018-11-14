@@ -18,13 +18,13 @@ namespace: "kube-system"
 name: "kube-monkey"
 #refer to https://github.com/asobti/kube-monkey for details about below attributes
 kubemonkey:
-  runhour: 10
-  starthour: 11
-  endhour: 14
-  blacklistednamespaces: "kube-system" #multiples can be declared ex : "xxx","yyy"
-  whitelistednamespaces: "go-demo-5" #multiples can be declared ex : "xxx","yyy"
-  timezone: "Australia/Melbourne"
-  graceperiodsec: 10
+  run_hour: 10
+  start_hour: 11
+  end_hour: 14
+  blacklisted_namespaces: "kube-system" #multiples can be declared ex : "xxx","yyy"
+  whitelisted_namespaces: "go-demo-5" #multiples can be declared ex : "xxx","yyy"
+  time_zone: "Australia/Melbourne"
+  graceperiod_sec: 10
   debug:
    enabled: true
-   scheduleimmediatekill: true
+   schedule_immediate_kill: true

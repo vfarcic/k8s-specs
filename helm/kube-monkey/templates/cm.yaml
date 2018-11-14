@@ -8,13 +8,13 @@ metadata:
 data:
   config.toml: |
     [kubemonkey]
-    run_hour = {{ .Values.kubemonkey.runhour }}
-    start_hour = {{ .Values.kubemonkey.starthour }}
-    end_hour = {{ .Values.kubemonkey.endhour }}
-    blacklisted_namespaces = ["{{ .Values.kubemonkey.blacklistednamespaces }}"]
-    whitelisted_namespaces = ["{{ .Values.kubemonkey.whitelistednamespaces }}"]
-    time_zone = "{{ .Values.kubemonkey.timezone }}"
-    graceperiod_sec= {{ .Values.kubemonkey.graceperiodsec }}
+    run_hour = {{ .Values.kubemonkey.run_hour }}
+    start_hour = {{ .Values.kubemonkey.start_hour }}
+    end_hour = {{ .Values.kubemonkey.end_hour }}
+    blacklisted_namespaces = ["{{ .Values.kubemonkey.blacklisted_namespaces }}"]
+    whitelisted_namespaces = ["{{ .Values.kubemonkey.whitelisted_namespaces }}"]
+    time_zone = "{{ .Values.kubemonkey.time_zone }}"
+    graceperiod_sec= {{ .Values.kubemonkey.graceperiod_sec }}
     [debug]
     enabled= {{ .Values.kubemonkey.debug.enabled }}
-    schedule_immediate_kill= {{ .Values.kubemonkey.debug.scheduleimmediatekill }}
+    schedule_immediate_kill= {{ .Values.kubemonkey.debug.schedule_immediate_kill }}
