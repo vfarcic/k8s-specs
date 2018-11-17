@@ -1,0 +1,7 @@
+ingress:
+  enabled: true
+persistence:
+  enabled: true
+  accessModes:
+  - ReadWriteOnce
+  size: 1Gi
