@@ -1,23 +1,22 @@
 Master:
-  ImageTag: "2.141-alpine"
+  ImageTag: "2.151-alpine"
   Cpu: "500m"
   Memory: "500Mi"
   ServiceType: ClusterIP
   ServiceAnnotations:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
   InstallPlugins:
-  - durable-task:1.25
-  - workflow-durable-task-step:2.21
+  - durable-task:1.26
+  - workflow-durable-task-step:2.25
   - blueocean:1.8.2
   - credentials:2.1.18
   - ec2:1.39
   - git:3.9.1
   - git-client:2.7.3
-  - github:1.29.2
-  - kubernetes:1.12.6
+  - github:1.29.3
+  - kubernetes:1.13.5
   - pipeline-utility-steps:2.1.0
   - pipeline-model-definition:1.3.2
-  - script-security:1.46
   - slack:2.3
   - thinBackup:1.9
   - workflow-aggregator:2.5
@@ -26,7 +25,7 @@ Master:
   - jdk-tool:1.1
   - command-launcher:1.2
   - github-oauth:0.29
-  - google-compute-engine:1.0.4
+  - google-compute-engine:1.0.5
   - pegdown-formatter:1.3
   Ingress:
     Annotations:
