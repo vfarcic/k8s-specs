@@ -9,6 +9,13 @@
       "pluginName": "Prometheus"
     },
     {
+      "name": "VAR_SECBUCKET",
+      "type": "constant",
+      "label": "Requests seconds bucket",
+      "value": "1",
+      "description": ""
+    },
+    {
       "name": "VAR_PODAGEDAYS",
       "type": "constant",
       "label": "Max Pod age in days",
@@ -135,7 +142,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1542214914256,
+  "iteration": 1542829853800,
   "links": [],
   "panels": [
     {
@@ -644,7 +651,7 @@
       "valueMaps": [
         {
           "op": "=",
-          "text": "N/A",
+          "text": "0",
           "value": "null"
         }
       ],
@@ -1906,82 +1913,22 @@
   "templating": {
     "list": [
       {
-        "auto": true,
-        "auto_count": 30,
-        "auto_min": "10s",
         "current": {
-          "text": "1",
-          "value": "1"
+          "value": "${VAR_SECBUCKET}",
+          "text": "${VAR_SECBUCKET}"
         },
         "hide": 2,
         "label": "Requests seconds bucket",
         "name": "secBucket",
         "options": [
           {
-            "selected": false,
-            "text": "auto",
-            "value": "$__auto_interval_secBucket"
-          },
-          {
-            "selected": false,
-            "text": "10",
-            "value": "10"
-          },
-          {
-            "selected": false,
-            "text": "5",
-            "value": "5"
-          },
-          {
-            "selected": false,
-            "text": "2.5",
-            "value": "2.5"
-          },
-          {
-            "selected": true,
-            "text": "1",
-            "value": "1"
-          },
-          {
-            "selected": false,
-            "text": "0.5",
-            "value": "0.5"
-          },
-          {
-            "selected": false,
-            "text": "0.25",
-            "value": "0.25"
-          },
-          {
-            "selected": false,
-            "text": "0.1",
-            "value": "0.1"
-          },
-          {
-            "selected": false,
-            "text": "0.05",
-            "value": "0.05"
-          },
-          {
-            "selected": false,
-            "text": "0.025",
-            "value": "0.025"
-          },
-          {
-            "selected": false,
-            "text": "0.01",
-            "value": "0.01"
-          },
-          {
-            "selected": false,
-            "text": "0.005",
-            "value": "0.005"
+            "value": "${VAR_SECBUCKET}",
+            "text": "${VAR_SECBUCKET}"
           }
         ],
-        "query": "\"10\",\"5\",\"2.5\",\"1\",\"0.5\",\"0.25\",\"0.1\",\"0.05\",\"0.025\",\"0.01\",\"0.005\"",
-        "refresh": 2,
+        "query": "${VAR_SECBUCKET}",
         "skipUrlSync": false,
-        "type": "interval"
+        "type": "constant"
       },
       {
         "current": {
@@ -2215,5 +2162,5 @@
   "timezone": "browser",
   "title": "The DevOps Toolkit: Kubernetes (via Prometheus)",
   "uid": "4-m_gSfik",
-  "version": 38
+  "version": 4
 }
