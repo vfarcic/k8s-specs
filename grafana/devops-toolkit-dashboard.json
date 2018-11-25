@@ -138,11 +138,12 @@
       }
     ]
   },
+  "description": "Kubernetes dashboard based on Prometheus metrics. With with out-of-the-box Prometheus installed through Helm.",
   "editable": true,
-  "gnetId": null,
+  "gnetId": 9132,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1542829853800,
+  "iteration": 1543147709789,
   "links": [],
   "panels": [
     {
@@ -487,7 +488,7 @@
       "valueMaps": [
         {
           "op": "=",
-          "text": "N/A",
+          "text": "0",
           "value": "null"
         }
       ],
@@ -829,7 +830,7 @@
         "#d44a3a"
       ],
       "datasource": "${DS_PROMETHEUS}",
-      "description": "The number of Pods with with less than $cpuReqPercentMin% or more than $cpuReqPercentMax% actual compared to reserved CPU",
+      "description": "The number of Pods with less than $cpuReqPercentMin% or more than $cpuReqPercentMax% actual compared to reserved CPU",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -1160,7 +1161,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 0,
           "description": "Calculates the percentage of requests in $$secBucket bucket entering through nginx Ingress.",
           "fill": 0,
           "gridPos": {
@@ -1262,7 +1263,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 1,
           "description": "Calculates the number of Ingress requests divided by Deployment replicas.",
           "fill": 0,
           "gridPos": {
@@ -1387,7 +1388,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 1,
           "description": "The percentage of nginx Ingress responses with 5xx code.",
           "fill": 0,
           "gridPos": {
@@ -1520,7 +1521,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 0,
           "description": "The percentage of memory usage compared to the limit",
           "fill": 0,
           "gridPos": {
@@ -1654,7 +1655,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 0,
           "description": "The percentage actual memory usage compared to reserved. The calculation excludes Pods with reserved memory equal to or smaller than $minBytes. Those with less than $minBytes of requested bytes are ignored.",
           "fill": 0,
           "gridPos": {
@@ -1796,7 +1797,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "decimals": null,
+          "decimals": 0,
           "description": "The percentage actual CPU usage compared to reserved. The calculation excludes Pods with reserved CPU equal to or smaller than $minCpu. Those with less than $minCpu of requested CPU are ignored.",
           "fill": 0,
           "gridPos": {
@@ -2162,5 +2163,5 @@
   "timezone": "browser",
   "title": "The DevOps Toolkit: Kubernetes (via Prometheus)",
   "uid": "4-m_gSfik",
-  "version": 4
+  "version": 3
 }

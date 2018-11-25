@@ -5,3 +5,10 @@ persistence:
   accessModes:
   - ReadWriteOnce
   size: 1Gi
+resources:
+  limits:
+    cpu: 20m
+    memory: 50Mi
+  requests:
+    cpu: 5m
+    memory: 25Mi
