@@ -143,7 +143,7 @@
   "gnetId": 9132,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1543147709789,
+  "iteration": 1543435045310,
   "links": [],
   "panels": [
     {
@@ -488,7 +488,7 @@
       "valueMaps": [
         {
           "op": "=",
-          "text": "0",
+          "text": "N/A",
           "value": "null"
         }
       ],
@@ -1044,6 +1044,7 @@
             {
               "expr": "sum(kube_pod_status_phase{phase=~\"Failed|Unknown|Pending\"}) by (namespace, pod) > 0",
               "format": "table",
+              "instant": true,
               "intervalFactor": 1,
               "refId": "A"
             }
@@ -1114,6 +1115,7 @@
             {
               "expr": "sum((time() - kube_pod_start_time{namespace!=\"kube-system\"}) > (60 * 60 * 24 * $podAgeDays)) by (namespace, pod)",
               "format": "table",
+              "instant": true,
               "intervalFactor": 1,
               "refId": "A"
             }
@@ -1798,7 +1800,7 @@
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
           "decimals": 0,
-          "description": "The percentage actual CPU usage compared to reserved. The calculation excludes Pods with reserved CPU equal to or smaller than $minCpu. Those with less than $minCpu of requested CPU are ignored.",
+          "description": "The percentage of actual CPU usage compared to reserved. The calculation excludes Pods with reserved CPU equal to or smaller than $minCpu. Those with less than $minCpu of requested CPU are ignored.",
           "fill": 0,
           "gridPos": {
             "h": 6,
@@ -2163,5 +2165,5 @@
   "timezone": "browser",
   "title": "The DevOps Toolkit: Kubernetes (via Prometheus)",
   "uid": "4-m_gSfik",
-  "version": 3
+  "version": 6
 }
