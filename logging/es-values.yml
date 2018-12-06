@@ -1,0 +1,25 @@
+client:
+  resources:
+    limits:
+      cpu: 1
+      memory: 1500Mi
+    requests:
+      cpu: 25m
+      memory: 750Mi
+master:
+  resources:
+    limits:
+      cpu: 1
+      memory: 1500Mi
+    requests:
+      cpu: 25m
+      memory: 750Mi
+data:
+  resources:
+    limits:
+      cpu: 1
+      memory: 3Gi
+    requests:
+      cpu: 100m
+      memory: 1500Mi
+
