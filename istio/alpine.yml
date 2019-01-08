@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpine
+  labels:
+    app: alpine
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: alpine
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alpine
+spec:
+  template:
+    metadata:
+      labels:
+        app: alpine
+    spec:
+      containers:
+      - name: alpine
+        image: alpine
+        command: ["sleep"]
+        args: ["100000"]
