@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta1
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/vfarcic/k8s-specs:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/vfarcic/k8s-specs:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: k8s-specs
+        chartPath: charts/k8s-specs
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/vfarcic/k8s-specs'
+          image.tag: '{{.DIGEST_HEX}}'
