@@ -20,3 +20,4 @@
 terraform.tfstate
 */.DS_Store
 /zones
+/myvalues.yaml
