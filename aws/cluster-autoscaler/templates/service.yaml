@@ -1,0 +1,21 @@
+---
+# Source: cluster-autoscaler/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: aws-cluster-autoscaler
+    chart: cluster-autoscaler-0.12.2
+    heritage: Tiller
+    release: aws-cluster-autoscaler
+  name: aws-cluster-autoscaler
+spec:
+  ports:
+    - port: 8085
+      protocol: TCP
+      targetPort: 8085
+      name: http
+  selector:
+    app: aws-cluster-autoscaler
+    release: aws-cluster-autoscaler
+  type: "ClusterIP"

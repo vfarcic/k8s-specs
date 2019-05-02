@@ -1,0 +1,28 @@
+---
+# Source: cluster-autoscaler/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  labels:
+    app: aws-cluster-autoscaler
+    chart: cluster-autoscaler-0.12.2
+    heritage: Tiller
+    release: aws-cluster-autoscaler
+  name: aws-cluster-autoscaler
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      - cluster-autoscaler-status
+    verbs:
+      - delete
+      - get
+      - update

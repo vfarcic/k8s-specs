@@ -1,0 +1,19 @@
+---
+# Source: cluster-autoscaler/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: aws-cluster-autoscaler
+    chart: cluster-autoscaler-0.12.2
+    heritage: Tiller
+    release: aws-cluster-autoscaler
+  name: aws-cluster-autoscaler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aws-cluster-autoscaler
+subjects:
+  - kind: ServiceAccount
+    name: aws-cluster-autoscaler
+    namespace: kube-system

@@ -1,0 +1,58 @@
+---
+# Source: cluster-autoscaler/templates/deployment.yaml
+
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: aws-cluster-autoscaler
+    chart: cluster-autoscaler-0.12.2
+    heritage: Tiller
+    release: aws-cluster-autoscaler
+  name: aws-cluster-autoscaler
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aws-cluster-autoscaler
+        release: aws-cluster-autoscaler
+    spec:
+      containers:
+        - name: aws-cluster-autoscaler
+          image: "k8s.gcr.io/cluster-autoscaler:v1.13.1"
+          imagePullPolicy: "IfNotPresent"
+          command:
+            - ./cluster-autoscaler
+            - --cloud-provider=aws
+            - --namespace=kube-system
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/jx-rocks
+            - --logtostderr=true
+            - --stderrthreshold=info
+            - --v=4
+
+          env:
+            - name: AWS_REGION
+              value: "us-west-2"
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: 8085
+          ports:
+            - containerPort: 8085
+          resources:
+            {}
+            
+          volumeMounts:
+            - name: ssl-certs
+              mountPath: /etc/kubernetes/pki/ca.crt
+              readOnly: true
+      serviceAccountName: aws-cluster-autoscaler
+      tolerations:
+        []
+        
+      volumes:
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs/ca-certificates.crt

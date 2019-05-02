@@ -1,7 +1,7 @@
-Master:
-  ServiceType: NodePort
-  NodePort: 31001
-  InstallPlugins:
+master:
+  serviceType: NodePort
+  nodePort: 31001
+  installPlugins:
     - kubernetes:1.4
     - credentials:2.1.16
     - workflow-aggregator:2.5
