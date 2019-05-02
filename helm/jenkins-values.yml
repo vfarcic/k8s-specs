@@ -1,3 +1,4 @@
+# helm install stable/jenkins --name jenkins --namespace jenkins --values helm/jenkins-values --set master.hostName=...
 master:
   imageTag: "2.151-alpine"
   cpu: "500m"
@@ -38,5 +39,5 @@ master:
       ingress.kubernetes.io/proxy-request-buffering: "off"
   hostName: jenkins.acme.com
 rbac:
-  install: true
-  roleBindingKind: RoleBinding
+  create: true
+
