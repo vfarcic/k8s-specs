@@ -19,5 +19,5 @@ ingress:
     ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
   hosts:
-    cm.127.0.0.1.nip.io:
-    - /
+  - name: cm.127.0.0.1.nip.io
+    path: /  
