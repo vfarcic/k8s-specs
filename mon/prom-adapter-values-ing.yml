@@ -1,5 +1,5 @@
 image:
-  tag: v0.3.0
+  tag: v0.5.0
 metricsRelistInterval: 90s
 prometheus:
   url: http://prometheus-server.metrics.svc

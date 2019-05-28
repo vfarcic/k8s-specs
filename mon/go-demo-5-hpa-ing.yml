@@ -14,6 +14,6 @@ spec:
     object:
       metricName: http_req_per_second_per_replica
       target:
-        kind: Ingress
+        kind: Namespace
         name: go-demo-5
       targetValue: 50m
