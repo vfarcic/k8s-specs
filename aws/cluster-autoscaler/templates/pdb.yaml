@@ -5,7 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.12.2
+    chart: cluster-autoscaler-0.14.2
     heritage: Tiller
     release: aws-cluster-autoscaler
   name: aws-cluster-autoscaler
