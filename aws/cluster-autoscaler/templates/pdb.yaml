@@ -4,16 +4,16 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.14.2
-    heritage: Tiller
-    release: aws-cluster-autoscaler
+    app.kubernetes.io/instance: "aws-cluster-autoscaler"
+    app.kubernetes.io/name: "aws-cluster-autoscaler"
+    app.kubernetes.io/managed-by: "Tiller"
+    helm.sh/chart: "cluster-autoscaler-3.2.0"
   name: aws-cluster-autoscaler
 spec:
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: aws-cluster-autoscaler
+      app.kubernetes.io/instance: "aws-cluster-autoscaler"
+      app.kubernetes.io/name: "aws-cluster-autoscaler"
   maxUnavailable: 1
   # minAvailable: 2
   

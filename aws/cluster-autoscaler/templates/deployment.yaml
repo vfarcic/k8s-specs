@@ -6,22 +6,22 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.14.2
-    heritage: Tiller
-    release: aws-cluster-autoscaler
+    app.kubernetes.io/instance: "aws-cluster-autoscaler"
+    app.kubernetes.io/name: "aws-cluster-autoscaler"
+    app.kubernetes.io/managed-by: "Tiller"
+    helm.sh/chart: "cluster-autoscaler-3.2.0"
   name: aws-cluster-autoscaler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: aws-cluster-autoscaler
+      app.kubernetes.io/instance: "aws-cluster-autoscaler"
+      app.kubernetes.io/name: "aws-cluster-autoscaler"
   template:
     metadata:
       labels:
-        app: aws-cluster-autoscaler
-        release: aws-cluster-autoscaler
+        app.kubernetes.io/instance: "aws-cluster-autoscaler"
+        app.kubernetes.io/name: "aws-cluster-autoscaler"
     spec:
       containers:
         - name: aws-cluster-autoscaler
@@ -31,7 +31,7 @@ spec:
             - ./cluster-autoscaler
             - --cloud-provider=aws
             - --namespace=kube-system
-            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/jx-rocks
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/jx-rocks
             - --logtostderr=true
             - --stderrthreshold=info
             - --v=4

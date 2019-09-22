@@ -4,10 +4,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.14.2
-    heritage: Tiller
-    release: aws-cluster-autoscaler
+    app.kubernetes.io/instance: "aws-cluster-autoscaler"
+    app.kubernetes.io/name: "aws-cluster-autoscaler"
+    app.kubernetes.io/managed-by: "Tiller"
+    helm.sh/chart: "cluster-autoscaler-3.2.0"
   name: aws-cluster-autoscaler
 rules:
   - apiGroups:
@@ -103,3 +103,10 @@ rules:
     - watch
     - list
     - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - list
+      - watch
