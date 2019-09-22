@@ -1,0 +1,22 @@
+---
+# Source: istio/charts/pilot/templates/poddisruptionbudget.yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-pilot
+  namespace: istio-system
+  labels:
+    app: pilot
+    chart: pilot
+    heritage: Tiller
+    release: istio
+    istio: pilot
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pilot
+      release: istio
+      istio: pilot

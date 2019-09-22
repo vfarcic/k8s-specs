@@ -21,5 +21,4 @@ terraform.tfstate
 */.DS_Store
 /zones
 /myvalues.yaml
-/charts/istio-init
-/istio/istio-init
+/charts/istio*

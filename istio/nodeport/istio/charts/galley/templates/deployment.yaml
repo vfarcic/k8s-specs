@@ -1,0 +1,131 @@
+---
+# Source: istio/charts/galley/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-galley
+  namespace: istio-system
+  labels:
+    app: galley
+    chart: galley
+    heritage: Tiller
+    release: istio
+    istio: galley
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      istio: galley
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: galley
+        chart: galley
+        heritage: Tiller
+        release: istio      
+        istio: galley
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: istio-galley-service-account
+      containers:
+        - name: galley
+          image: "docker.io/istio/galley:1.3.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 443
+          - containerPort: 15014
+          - containerPort: 9901
+          command:
+          - /usr/local/bin/galley
+          - server
+          - --meshConfigFile=/etc/mesh-config/mesh
+          - --livenessProbeInterval=1s
+          - --livenessProbePath=/healthliveness
+          - --readinessProbePath=/healthready
+          - --readinessProbeInterval=1s
+          - --deployment-namespace=istio-system
+          - --insecure=true
+          - --validation-webhook-config-file
+          - /etc/config/validatingwebhookconfiguration.yaml
+          - --monitoringPort=15014
+          - --log_output_level=default:info
+          volumeMounts:
+          - name: certs
+            mountPath: /etc/certs
+            readOnly: true
+          - name: config
+            mountPath: /etc/config
+            readOnly: true
+          - name: mesh-config
+            mountPath: /etc/mesh-config
+            readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/bin/galley
+                - probe
+                - --probe-path=/healthliveness
+                - --interval=10s
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /usr/local/bin/galley
+                - probe
+                - --probe-path=/healthready
+                - --interval=10s
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 10m
+            
+      volumes:
+      - name: certs
+        secret:
+          secretName: istio.istio-galley-service-account
+      - name: config
+        configMap:
+          name: istio-galley-configuration
+      - name: mesh-config
+        configMap:
+          name: istio
+      affinity:      
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+                - "ppc64le"
+                - "s390x"
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "ppc64le"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "s390x"      

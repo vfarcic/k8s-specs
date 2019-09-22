@@ -1,0 +1,23 @@
+---
+# Source: istio/charts/gateways/templates/poddisruptionbudget.yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+  labels:
+    chart: gateways
+    heritage: Tiller
+    release: istio
+    app: istio-ingressgateway
+    istio: ingressgateway
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      release: istio
+      app: istio-ingressgateway
+      istio: ingressgateway
+---
