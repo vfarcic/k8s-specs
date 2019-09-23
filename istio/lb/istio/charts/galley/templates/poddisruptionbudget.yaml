@@ -1,0 +1,22 @@
+---
+# Source: istio/charts/galley/templates/poddisruptionbudget.yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-galley
+  namespace: istio-system
+  labels:
+    app: galley
+    chart: galley
+    heritage: Tiller
+    release: istio
+    istio: galley
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: galley
+      release: istio
+      istio: galley

@@ -1,0 +1,352 @@
+---
+# Source: istio/charts/mixer/templates/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-policy
+  namespace: istio-system
+  labels:
+    app: istio-mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+    istio: mixer
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      istio: mixer
+      istio-mixer-type: policy
+  template:
+    metadata:
+      labels:
+        app: policy
+        chart: mixer
+        heritage: Tiller
+        release: istio
+        istio: mixer
+        istio-mixer-type: policy
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: istio-mixer-service-account
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.istio-mixer-service-account
+          optional: true
+      - name: uds-socket
+        emptyDir: {}
+      - name: policy-adapter-secret
+        secret:
+          secretName: policy-adapter-secret
+          optional: true
+      affinity:      
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+                - "ppc64le"
+                - "s390x"
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "ppc64le"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "s390x"      
+      containers:
+      - name: mixer
+        image: "docker.io/istio/mixer:1.3.0"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 15014
+        - containerPort: 42422
+        args:
+          - --monitoringPort=15014
+          - --address
+          - unix:///sock/mixer.socket
+          - --log_output_level=default:info
+          - --configStoreURL=mcp://istio-galley.istio-system.svc:9901
+          - --configDefaultNamespace=istio-system
+          - --useAdapterCRDs=false
+          - --useTemplateCRDs=false
+          - --trace_zipkin_url=http://zipkin.istio-system:9411/api/v1/spans
+        env:
+        - name: GODEBUG
+          value: "gctrace=1"
+        - name: GOMAXPROCS
+          value: "6"
+        resources:
+          requests:
+            cpu: 10m
+          
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/certs
+          readOnly: true
+        - name: uds-socket
+          mountPath: /sock
+        livenessProbe:
+          httpGet:
+            path: /version
+            port: 15014
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      - name: istio-proxy
+        image: "docker.io/istio/proxyv2:1.3.0"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9091
+        - containerPort: 15004
+        - containerPort: 15090
+          protocol: TCP
+          name: http-envoy-prom
+        args:
+        - proxy
+        - --domain
+        - $(POD_NAMESPACE).svc.cluster.local
+        - --serviceCluster
+        - istio-policy
+        - --templateFile
+        - /etc/istio/proxy/envoy_policy.yaml.tmpl
+        - --controlPlaneAuthPolicy
+        - NONE
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: INSTANCE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: SDS_ENABLED
+          value: "false"
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/certs
+          readOnly: true
+        - name: uds-socket
+          mountPath: /sock
+        - name: policy-adapter-secret
+          mountPath: /var/run/secrets/istio.io/policy/adapter
+          readOnly: true
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-telemetry
+  namespace: istio-system
+  labels:
+    app: istio-mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+    istio: mixer
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      istio: mixer
+      istio-mixer-type: telemetry
+  template:
+    metadata:
+      labels:
+        app: telemetry
+        chart: mixer
+        heritage: Tiller
+        release: istio
+        istio: mixer
+        istio-mixer-type: telemetry
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: istio-mixer-service-account
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.istio-mixer-service-account
+          optional: true
+      - name: uds-socket
+        emptyDir: {}
+      - name: telemetry-adapter-secret
+        secret:
+          secretName: telemetry-adapter-secret
+          optional: true
+      affinity:      
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+                - "ppc64le"
+                - "s390x"
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "amd64"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "ppc64le"
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - "s390x"      
+      containers:
+      - name: mixer
+        image: "docker.io/istio/mixer:1.3.0"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 15014
+        - containerPort: 42422
+        args:
+          - --monitoringPort=15014
+          - --address
+          - unix:///sock/mixer.socket
+          - --log_output_level=default:info
+          - --configStoreURL=mcp://istio-galley.istio-system.svc:9901
+          - --configDefaultNamespace=istio-system
+          - --useAdapterCRDs=false
+          - --trace_zipkin_url=http://zipkin.istio-system:9411/api/v1/spans
+          - --averageLatencyThreshold
+          - 100ms
+          - --loadsheddingMode
+          - enforce
+        env:
+        - name: GODEBUG
+          value: "gctrace=1"
+        - name: GOMAXPROCS
+          value: "6"
+        resources:
+          limits:
+            cpu: 4800m
+            memory: 4G
+          requests:
+            cpu: 1000m
+            memory: 1G
+          
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/certs
+          readOnly: true
+        - name: telemetry-adapter-secret
+          mountPath: /var/run/secrets/istio.io/telemetry/adapter
+          readOnly: true
+        - name: uds-socket
+          mountPath: /sock
+        livenessProbe:
+          httpGet:
+            path: /version
+            port: 15014
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      - name: istio-proxy
+        image: "docker.io/istio/proxyv2:1.3.0"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9091
+        - containerPort: 15004
+        - containerPort: 15090
+          protocol: TCP
+          name: http-envoy-prom
+        args:
+        - proxy
+        - --domain
+        - $(POD_NAMESPACE).svc.cluster.local
+        - --serviceCluster
+        - istio-telemetry
+        - --templateFile
+        - /etc/istio/proxy/envoy_telemetry.yaml.tmpl
+        - --controlPlaneAuthPolicy
+        - NONE
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: INSTANCE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: SDS_ENABLED
+          value: "false"
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/certs
+          readOnly: true
+        - name: uds-socket
+          mountPath: /sock
+
+--- 

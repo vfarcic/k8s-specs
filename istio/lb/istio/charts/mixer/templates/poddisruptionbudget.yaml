@@ -1,0 +1,49 @@
+---
+# Source: istio/charts/mixer/templates/poddisruptionbudget.yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-policy
+  namespace: istio-system
+  labels:
+    app: policy
+    chart: mixer
+    heritage: Tiller
+    release: istio
+    version: 1.3.0
+    istio: mixer
+    istio-mixer-type: policy
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: policy
+      release: istio
+      istio: mixer
+      istio-mixer-type: policy
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-telemetry
+  namespace: istio-system
+  labels:
+    app: telemetry
+    chart: mixer
+    heritage: Tiller
+    release: istio
+    version: 1.3.0
+    istio: mixer
+    istio-mixer-type: telemetry
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: telemetry
+      release: istio
+      istio: mixer
+      istio-mixer-type: telemetry
+---

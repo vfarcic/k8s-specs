@@ -1,0 +1,20 @@
+---
+# Source: istio/charts/sidecarInjectorWebhook/templates/poddisruptionbudget.yaml
+
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: istio-sidecar-injector
+  namespace: istio-system
+  labels:
+    app: sidecarInjectorWebhook
+    release: istio
+    istio: sidecar-injector
+spec:
+
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: sidecarInjectorWebhook
+      release: istio
+      istio: sidecar-injector
