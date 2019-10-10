@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/instance: "aws-cluster-autoscaler"
     app.kubernetes.io/name: "aws-cluster-autoscaler"
     app.kubernetes.io/managed-by: "Tiller"
-    helm.sh/chart: "cluster-autoscaler-3.2.0"
+    helm.sh/chart: "cluster-autoscaler-4.0.1"
   name: aws-cluster-autoscaler
 spec:
   replicas: 1
@@ -25,13 +25,13 @@ spec:
     spec:
       containers:
         - name: aws-cluster-autoscaler
-          image: "k8s.gcr.io/cluster-autoscaler:v1.13.1"
+          image: "k8s.gcr.io/cluster-autoscaler:v1.13.7"
           imagePullPolicy: "IfNotPresent"
           command:
             - ./cluster-autoscaler
             - --cloud-provider=aws
             - --namespace=kube-system
-            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/jx-rocks
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/jx-boot-eks
             - --logtostderr=true
             - --stderrthreshold=info
             - --v=4
@@ -48,15 +48,7 @@ spec:
           resources:
             {}
             
-          volumeMounts:
-            - name: ssl-certs
-              mountPath: /etc/kubernetes/pki/ca.crt
-              readOnly: true
       serviceAccountName: aws-cluster-autoscaler
       tolerations:
         []
         
-      volumes:
-        - name: ssl-certs
-          hostPath:
-            path: /etc/ssl/certs/ca-certificates.crt
