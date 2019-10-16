@@ -4,7 +4,6 @@ metadata:
   name: go-demo-2
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
@@ -18,7 +17,7 @@ spec:
 
 ---
 
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: go-demo-2-db
@@ -55,7 +54,7 @@ spec:
 
 ---
 
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: go-demo-2-api
@@ -100,3 +99,4 @@ spec:
   selector:
     type: api
     service: go-demo-2
+
