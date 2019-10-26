@@ -1,0 +1,73 @@
+## Default values for maesh
+controller:
+  image:
+    name: containous/maesh
+    # (Optional)
+    # pullPolicy: IfNotPresent
+    # (Optional)
+    # tag: v0.0.1
+    # (Optional)
+    # pullSecret: xxx
+  resources:
+    limit:
+      mem: "100Mi"
+      cpu: "200m"
+    request:
+      mem: "50Mi"
+      cpu: "100m"
+  logging:
+    debug: true
+  ignoreNamespaces:
+  # Added so we can launch on nodes with restrictions
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+kubedns: false
+
+mesh:
+  image:
+    name: traefik:v2.0.0
+    # (Optional)
+    # pullPolicy: IfNotPresent
+    # (Optional)
+    # tag: v0.0.1
+    # (Optional)
+    # pullSecret: xxx
+  resources:
+    limit:
+      mem: "100Mi"
+      cpu: "200m"
+    request:
+      mem: "50Mi"
+      cpu: "100m"
+  logging: INFO
+  defaultMode: http
+  # Added so we can launch on nodes with restrictions
+  tolerations: []
+
+#
+# addon jaeger tracing configuration
+#
+tracing:
+  deploy: true
+  jaeger:
+    image: 
+      name: groundnuty/k8s-wait-for:v1.2
+    enabled: true
+    localagenthostport: ""
+    samplingserverurl: ""
+
+#
+# addon metrics configuration
+#
+metrics:
+  deploy: true
+  prometheus:
+    enabled: true
+
+smi: false
+
+limits:
+  http: 10
+  tcp: 25

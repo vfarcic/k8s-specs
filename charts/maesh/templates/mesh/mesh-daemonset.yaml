@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: maesh-mesh
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name | quote }}
+    chart: {{ include "maesh.chartLabel" . | quote }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name | quote }}
+      component: maesh-mesh
+      release: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name | quote }}
+        component: maesh-mesh
+        release: {{ .Release.Name | quote }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      serviceAccountName: maesh-mesh
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      terminationGracePeriodSeconds: 30
+      {{- with .Values.mesh.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- if .Values.tracing.deploy }}
+      initContainers:
+        - name: wait-for-jaeger-init
+          image: {{ .Values.tracing.jaeger.image.name | quote }}
+          imagePullPolicy: {{ .Values.tracing.jaeger.image.pullPolicy | default "IfNotPresent" }}
+          args: ["service", "-lapp.kubernetes.io/name=jaeger-agent"]
+          resources:
+            requests:
+              memory: "10Mi"
+              cpu: "50m"
+            limits:
+              memory: "20Mi"
+              cpu: "100m"
+      {{- end }}
+      containers:
+        - name: maesh-mesh
+          image: {{ .Values.mesh.image.name | quote }}
+          imagePullPolicy: {{ .Values.mesh.image.pullPolicy | default "IfNotPresent" }}
+          args:
+            - "--entryPoints.readiness.address=:1081"
+          {{- range $i, $e := until (.Values.limits.http|int) }}
+            - {{ printf "\"--entryPoints.http-%d.address=:%d\"" (add $i 5000) (add $i 5000) }}
+          {{- end }}
+          {{- range $i, $e := until (.Values.limits.tcp|int) }}
+            - {{ printf "\"--entryPoints.tcp-%d.address=:%d\"" (add $i 10000) (add $i 10000) }}
+          {{- end }}
+            - "--providers.rest"
+            - "--providers.rest.insecure"
+            {{- if .Values.tracing.jaeger.enabled }}
+              {{- if .Values.tracing.jaeger.localagenthostport }}
+            - "--tracing.jaeger.localagenthostport={{ .Values.tracing.jaeger.localagenthostport }}"
+              {{- else }}
+            - "--tracing.jaeger.localagenthostport=jaeger-agent.{{ .Release.Namespace }}.svc.cluster.local:6831"
+              {{- end }}
+              {{- if .Values.tracing.jaeger.localagenthostport }}
+            - "--tracing.jaeger.samplingserverurl={{ .Values.tracing.jaeger.samplingserverurl }}"
+              {{- else }}
+            - "--tracing.jaeger.samplingserverurl=http://jaeger-agent.{{ .Release.Namespace }}.svc.cluster.local:5778/sampling"
+              {{- end }}
+            {{- end }}
+            - "--api.dashboard"
+            - "--api.insecure"
+            - "--ping"
+            - "--log.level={{ .Values.mesh.logging }}"
+            {{- if .Values.metrics.prometheus.enabled }}
+            - "--metrics.prometheus"
+            {{- end }}
+          ports:
+            - name: readiness
+              containerPort: 1081
+            - name: liveness
+              containerPort: 10000
+            - name: api
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: readiness
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          livenessProbe:
+            tcpSocket:
+              port: liveness
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          resources:
+            requests:
+              memory: {{ .Values.mesh.resources.request.mem }}
+              cpu: {{ .Values.mesh.resources.request.cpu }}
+            limits:
+              memory: {{ .Values.mesh.resources.limit.mem }}
+              cpu: {{ .Values.mesh.resources.limit.cpu }}

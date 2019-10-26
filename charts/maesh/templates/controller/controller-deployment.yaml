@@ -1,0 +1,110 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maesh-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name | quote }}
+    chart: {{ include "maesh.chartLabel" . | quote }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name | quote }}
+      component: controller
+      release: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name | quote }}
+        component: controller
+        release: {{ .Release.Name | quote }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4646"
+    spec:
+      serviceAccountName: maesh-controller
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - controller
+                topologyKey: "kubernetes.io/hostname"
+      {{- if .Values.controller.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.controller.image.pullSecret }}
+      {{- end }}
+      {{- with .Values.controller.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.controller.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.controller.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: maesh-controller
+          image: {{ include "maesh.controllerImage" . | quote }}
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy | default "IfNotPresent" }}
+          args:
+            {{- if .Values.controller.logging.debug }}
+            - "--debug"
+            {{- end }}
+            {{- if .Values.mesh }}
+            - "--defaultMode={{ .Values.mesh.defaultMode }}"
+            {{- end }}
+            {{- if .Values.smi }}
+            - "--smi"
+            {{- end }}
+            - "--namespace=$(POD_NAMESPACE)"
+            {{- if .Values.controller.ignoreNamespaces }}
+            - {{ include "maesh.controllerIgnoreNamespaces" . | quote }}
+            {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            requests:
+              memory: {{ .Values.controller.resources.request.mem }}
+              cpu: {{ .Values.controller.resources.request.cpu }}
+            limits:
+              memory: {{ .Values.controller.resources.limit.mem }}
+              cpu: {{ .Values.controller.resources.limit.cpu }}
+      initContainers:
+        - name: maesh-prepare
+          image: {{ include "maesh.controllerImage" . | quote }}
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy | default "IfNotPresent"}}
+          args:
+            - "prepare"
+            {{- if .Values.controller.logging.debug }}
+            - "--debug"
+            {{- end }}
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
