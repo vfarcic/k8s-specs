@@ -1,6 +1,7 @@
-account.json
 .terraform
 *.tfstate*
 kubeconfig
 devops-toolkit
-*.tar.gz
+charts
+k8s-specs
+credentials
