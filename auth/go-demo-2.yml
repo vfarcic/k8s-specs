@@ -18,7 +18,7 @@ spec:
 
 ---
 
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: go-demo-2-db
@@ -55,7 +55,7 @@ spec:
 
 ---
 
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: go-demo-2-api
