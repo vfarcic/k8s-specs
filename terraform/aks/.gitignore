@@ -1,0 +1,6 @@
+client_id
+client_secret
+.terraform
+*.tfstate*
+kubeconfig
+devops-toolkit

@@ -63,12 +63,10 @@ resource "azurerm_kubernetes_cluster" "primary" {
     vm_size             = var.vm_size
     type                = "VirtualMachineScaleSets"
   }
-
   service_principal {
     client_id     = "${file("client_id")}"
     client_secret = "${file("client_secret")}"
   }
-
 }
 
 output "cluster_name" {
