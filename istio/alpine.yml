@@ -18,6 +18,9 @@ kind: Deployment
 metadata:
   name: alpine
 spec:
+  selector:
+    matchLabels:
+      app: alpine
   template:
     metadata:
       labels:
