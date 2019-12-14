@@ -3,7 +3,7 @@ ingress:
   hosts:
   - acme.com
 env:
-  ELASTICSEARCH_URL: http://elasticsearch-client:9200
+  ELASTICSEARCH_HOSTS: http://elasticsearch-client:9200
 resources:
   limits:
     cpu: 50m

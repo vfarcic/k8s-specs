@@ -205,7 +205,7 @@ alertmanagerFiles:
     receivers:
     - name: slack
       slack_configs:
-      - api_url: "https://hooks.slack.com/services/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"
+      - api_url: "https://hooks.slack.com/services/@T308SC7HD@/@BD8BU8TUH@/@FGPe7VI4ehPFYdLqopA8vxOi@"
         send_resolved: true
         title: "{{ .CommonAnnotations.summary }}"
         text: "{{ .CommonAnnotations.description }}"
