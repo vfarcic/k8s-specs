@@ -1,6 +1,6 @@
 variable "cluster_name" {
   type    = string
-  default = "jx"
+  default = "jx-cluster"
 }
 
 variable "project_id" {
