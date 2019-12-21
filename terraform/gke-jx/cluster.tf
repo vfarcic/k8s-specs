@@ -1,6 +1,6 @@
 variable "cluster_name" {
   type    = string
-  default = "devops-paradox"
+  default = "jx"
 }
 
 variable "project_id" {
@@ -15,7 +15,7 @@ variable "region" {
 
 variable "machine_type" {
   type    = string
-  default = "g1-small"
+  default = "n1-standard-2"
 }
 
 variable "preemptible" {
