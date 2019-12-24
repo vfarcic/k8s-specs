@@ -121,10 +121,10 @@ spec:
             port: 8080
         resources:
           limits:
-            memory: "10Mi"
-            cpu: 0.1
+            memory: "25Mi"
+            cpu: 0.1  
           requests:
-            memory: "5Mi"
+            memory: "10Mi"
             cpu: 0.01
 
 ---

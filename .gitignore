@@ -9,6 +9,7 @@
 /cd/docker-build/*.log
 /helm/jenkins/*.lock
 /helm/jenkins2/*.lock
+/kubeconfig
 # terraform
 /terraform/terraform.tf*
 /terraform/*.pem
