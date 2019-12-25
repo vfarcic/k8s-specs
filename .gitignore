@@ -24,3 +24,4 @@ terraform.tfstate
 /zones
 /myvalues.yaml
 /charts/istio*
+/account.json
