@@ -41,11 +41,11 @@ spec:
         image: mongo:3.3
         resources:
           limits:
-            memory: "10Mi"
-            cpu: 1
-          requests:
-            memory: "5Mi"
+            memory: 20Mi
             cpu: 0.5
+          requests:
+            memory: 10Mi
+            cpu: 0.3
 
 ---
 
@@ -96,11 +96,11 @@ spec:
             port: 8080
         resources:
           limits:
-            memory: "100Mi"
-            cpu: 0.4
+            memory: 100Mi
+            cpu: 200m
           requests:
-            memory: "50Mi"
-            cpu: 0.2
+            memory: 50Mi
+            cpu: 100m
 
 ---
 
