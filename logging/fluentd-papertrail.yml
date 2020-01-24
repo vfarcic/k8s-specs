@@ -53,6 +53,9 @@ metadata:
     version: v1
     kubernetes.io/cluster-service: "true"
 spec:
+  selector:
+    matchLabels:
+      k8s-app: fluentd-papertrail
   updateStrategy:
     type: RollingUpdate
   template:
