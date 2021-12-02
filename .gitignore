@@ -25,3 +25,5 @@ terraform.tfstate
 /myvalues.yaml
 /charts/istio*
 /account.json
+# ides
+.idea
