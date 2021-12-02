@@ -70,7 +70,7 @@ spec:
 
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: jenkins
@@ -88,9 +88,12 @@ spec:
   - http:
       paths:
       - path: /jenkins
+        pathType: ImplementationSpecific
         backend:
-          serviceName: jenkins
-          servicePort: 80
+          service:
+            name: jenkins
+            port:
+              number: 80
 
 ---
 

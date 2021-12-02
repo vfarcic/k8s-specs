@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: devops-toolkit
@@ -12,8 +12,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: devops-toolkit
-          servicePort: 80
+          service:
+            name: devops-toolkit
+            port:
+              number: 80
 
 ---
 

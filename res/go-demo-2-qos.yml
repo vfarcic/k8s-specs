@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: go-demo-2
@@ -12,9 +12,12 @@ spec:
     http:
       paths:
       - path: /demo
+        pathType: ImplementationSpecific
         backend:
-          serviceName: go-demo-2-api
-          servicePort: 8080
+          service:
+            name: go-demo-2-api
+            port:
+              number: 8080
 
 ---
 
