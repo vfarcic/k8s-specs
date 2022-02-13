@@ -1,40 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: go-demo-2-api
+  name: something
 spec:
-  replicas: 3
   selector:
     matchLabels:
-      type: api
-      service: go-demo-2
-  minReadySeconds: 1
-  progressDeadlineSeconds: 60
-  revisionHistoryLimit: 5
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      app: something
   template:
     metadata:
       labels:
-        type: api
-        service: go-demo-2
-        language: go
+        app: something
     spec:
       containers:
-      - name: api
-        image: vfarcic/go-demo-2
-        env:
-        - name: DB
-          value: go-demo-2-db
-        readinessProbe:
-          httpGet:
-            path: /demo/hello
-            port: 8080
-          periodSeconds: 1
-        livenessProbe:
-          httpGet:
-            path: /demo/hello
-            port: 8080
+      - name: something
+        image: <Image>
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: <Port>
